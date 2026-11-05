@@ -32,7 +32,7 @@ export default function CanyonSuitcase({
     topSpaceMobile = "-350vw",  // above "Yeehaw!!" on phones
     pinOffsetMobile = 0,        // phones: px. 0 = the pin starts exactly when the title hits the top of the screen.
                                 // Positive = pin starts a bit LATER, negative = a bit EARLIER
-    applyUrl = "/Apply", // optional: if you don't provide onApply, clicking the bottom half of the open case goes here
+    applyUrl = "/apply", // optional: if you don't provide onApply, clicking the bottom half of the open case goes here
     onApply, // optional: e.g. () => navigate("/apply") with React Router
 }) {
     const sectionRef = useRef(null);
