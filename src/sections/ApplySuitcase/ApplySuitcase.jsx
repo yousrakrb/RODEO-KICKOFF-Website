@@ -1,4 +1,3 @@
-// src/sections/ApplySuitcase/ApplySuitcase.jsx
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -7,27 +6,38 @@ import './ApplySuitcase.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// one entry per frame you have — add/remove to match how many you get made
-const FRAMES = [
-    '/assets/suitcase/frame-0-closed.png',
-    '/assets/suitcase/frame-1-quarter.png',
-    '/assets/suitcase/frame-2-half.png',
-    '/assets/suitcase/frame-3-threequarter.png',
-    '/assets/suitcase/frame-4-open.png',
-];
-
 export default function ApplySuitcase() {
     const sectionRef = useRef(null);
-    const imgRef = useRef(null);
+    const modelRef = useRef(null);
     const buttonWrapRef = useRef(null);
-    const frameState = useRef({ index: 0 });
+    const readyRef = useRef(false);
 
     useEffect(() => {
-        // preload all frames so there's no flicker/pop-in when switching
-        FRAMES.forEach((src) => {
-            const img = new Image();
-            img.src = src;
-        });
+        const modelEl = modelRef.current;
+
+        // Runs once the .glb has fully loaded. We grab the first animation
+        // clip, "arm" it with play()/pause() so the model is ready to seek,
+        // then reset to frame 0 (closed) before scroll takes over.
+        const onLoad = () => {
+            if (modelEl.availableAnimations?.length) {
+                modelEl.animationName = modelEl.availableAnimations[0];
+            }
+            modelEl.play();
+            modelEl.pause();
+            modelEl.currentTime = 0;
+            readyRef.current = true;
+
+            // Debug line — check your browser console once to confirm the
+            // animation was found and has a real duration. Remove once confirmed.
+            console.log('Suitcase model loaded:', {
+                animations: modelEl.availableAnimations,
+                duration: modelEl.duration,
+            });
+        };
+
+        modelEl.addEventListener('load', onLoad);
+
+        const isMobile = window.innerWidth < 768;
 
         const ctx = gsap.context(() => {
             gsap.set(buttonWrapRef.current, { opacity: 0 });
@@ -37,22 +47,13 @@ export default function ApplySuitcase() {
                 start: 'top top',
                 end: '+=700',
                 scrub: true,
-                pin: true,
-                anticipatePin: 1,
-                invalidateOnRefresh: true, // recalculates on phone rotate/resize
+                pin: !isMobile,
                 onUpdate: (self) => {
-                    const progress = self.progress; // 0 to 1
-                    const frameIndex = Math.min(
-                        FRAMES.length - 1,
-                        Math.floor(progress * FRAMES.length)
-                    );
+                    if (!readyRef.current) return;
+                    const progress = self.progress;
+                    const duration = modelEl.duration || 0;
+                    modelEl.currentTime = progress * duration;
 
-                    if (frameIndex !== frameState.current.index) {
-                        frameState.current.index = frameIndex;
-                        imgRef.current.src = FRAMES[frameIndex];
-                    }
-
-                    // fade in the button only once we're mostly open
                     gsap.set(buttonWrapRef.current, {
                         opacity: progress > 0.8 ? (progress - 0.8) / 0.2 : 0,
                     });
@@ -60,14 +61,8 @@ export default function ApplySuitcase() {
             });
         }, sectionRef);
 
-        // the first frame's height changes the layout once it loads,
-        // so refresh the pin positions after that
-        const first = imgRef.current;
-        const refresh = () => ScrollTrigger.refresh();
-        if (first && !first.complete) first.addEventListener('load', refresh);
-
         return () => {
-            if (first) first.removeEventListener('load', refresh);
+            modelEl.removeEventListener('load', onLoad);
             ctx.revert();
         };
     }, []);
@@ -75,7 +70,16 @@ export default function ApplySuitcase() {
     return (
         <section ref={sectionRef} className="apply-suitcase">
             <div className="suitcase-stage">
-                <img ref={imgRef} src={FRAMES[0]} alt="" className="suitcase-frame" />
+                <model-viewer
+                    ref={modelRef}
+                    src="/assets/suitcase/suitcase.glb"
+                    alt="Rodeo Kickoff suitcase"
+                    disable-zoom
+                    disable-pan
+                    disable-tap
+                    interaction-prompt="none"
+                    shadow-intensity="1"
+                ></model-viewer>
 
                 <div ref={buttonWrapRef} className="apply-button-wrap">
                     <FloatingElement>

@@ -5,21 +5,21 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    min-height: 100svh; /* real visible height on mobile browsers */
     padding: 2rem 1rem;
-    box-sizing: border-box;
-    margin: 0;
 }
 
 .suitcase-stage {
     position: relative;
     width: min(90%, 500px);
+    aspect-ratio: 5 / 4; /* adjust to roughly match your model's natural proportions */
 }
 
-.suitcase-frame {
+model-viewer {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
+    --poster-color: transparent;
+    background-color: transparent;
 }
 
 .apply-button-wrap {
@@ -38,17 +38,4 @@
     cursor: pointer;
     width: clamp(100px, 20vw, 160px);
     height: clamp(50px, 10vw, 80px);
-}
-
-/* ---------- Phone layout ---------- */
-@media (max-width: 768px) {
-    .apply-suitcase {
-        align-items: flex-start; /* no more floating in the middle */
-        padding: 0.5rem 0.5rem 1rem;
-    }
-
-    .suitcase-stage {
-        width: 100%; /* use the full phone width */
-        margin-top: 0;
-    }
 }
