@@ -11,6 +11,8 @@ import GearComingSoon from './sections/GearComingSoon/GearComingSoon';
 import Navbar from './components/Navbar/Navbar';
 import { useSmoothScroll } from './hooks/useSmoothScroll';
 import CanyonSuitcase from './sections/Suitcase/Canyonsuitcase';
+import MusicPlayer from './components/MusicPlayer/MusicPlayer';
+
 
 function Layout() {
   useSmoothScroll();
@@ -18,6 +20,7 @@ function Layout() {
   return (
     <>
       <Navbar />
+      <MusicPlayer />
       <Outlet />
     </>
   );

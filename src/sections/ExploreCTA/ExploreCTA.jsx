@@ -2,7 +2,7 @@
 import FloatingElement from '../../components/FloatingElement/FloatingElement';
 import './ExploreCTA.css';
 
-const BOOKLET_DRIVE_URL = '[INSERT YOUR GOOGLE DRIVE BOOKLET LINK HERE]';
+const BOOKLET_DRIVE_URL = 'https://drive.google.com/file/d/1kI992Mr5_cXzFj17rt3ShfQ-YLyKqCQo/view?fbclid=IwY2xjawVZ4sJleHRuA2FlbQIxMABwZG9mAXNydGMGYXBwX2lkEDIyMjAzOTE3ODgyMDA4OTIAAR9bzCCweTM_fUJJOnRBXCKoKWggMeNM00_v3weLfta1hO3_H25OZefpU-dDYw_aem_Qd0xKUWwU-BlrEP5ZnrWcQ&pli=1';
 
 export default function ExploreCTA() {
     return (
