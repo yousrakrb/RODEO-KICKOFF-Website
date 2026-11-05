@@ -1,3 +1,4 @@
+// src/sections/ApplySuitcase/ApplySuitcase.jsx
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -15,9 +16,9 @@ export default function ApplySuitcase() {
     useEffect(() => {
         const modelEl = modelRef.current;
 
-        // Runs once the .glb has fully loaded. We grab the first animation
-        // clip, "arm" it with play()/pause() so the model is ready to seek,
-        // then reset to frame 0 (closed) before scroll takes over.
+        // Runs once the .glb has fully loaded. Grabs the first animation
+        // clip, "arms" it with play()/pause() so it's ready to seek, then
+        // resets to frame 0 (closed) before scroll takes over.
         const onLoad = () => {
             if (modelEl.availableAnimations?.length) {
                 modelEl.animationName = modelEl.availableAnimations[0];
@@ -27,8 +28,10 @@ export default function ApplySuitcase() {
             modelEl.currentTime = 0;
             readyRef.current = true;
 
-            // Debug line — check your browser console once to confirm the
-            // animation was found and has a real duration. Remove once confirmed.
+            // re-measure scroll positions now that the model has settled
+            // into its final size, so ScrollTrigger's pin math is accurate
+            ScrollTrigger.refresh();
+
             console.log('Suitcase model loaded:', {
                 animations: modelEl.availableAnimations,
                 duration: modelEl.duration,
@@ -72,7 +75,7 @@ export default function ApplySuitcase() {
             <div className="suitcase-stage">
                 <model-viewer
                     ref={modelRef}
-                    src="/assets/suitcase/suitcase.glb"
+                    src="/assets/suitcase/case.glb"
                     alt="Rodeo Kickoff suitcase"
                     disable-zoom
                     disable-pan

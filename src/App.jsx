@@ -4,14 +4,13 @@ import './App.css';
 import Hero from './sections/Hero/Hero';
 import Countdown from './sections/Countdown/Countdown';
 import CanyonMap from './sections/CanyonMap/CanyonMap';
-import ApplySuitcase from './sections/ApplySuitcase/ApplySuitcase';
 import Footer from './sections/Footer/Footer';
 import RegistrationPage from './sections/Registration/RegistrationPage';
-import CanyonSuitcase from './sections/Suitcase/Canyonsuitcase';
 import PreOrder from './sections/Preorder/Preorder';
 import GearComingSoon from './sections/GearComingSoon/GearComingSoon';
 import Navbar from './components/Navbar/Navbar';
 import { useSmoothScroll } from './hooks/useSmoothScroll';
+import CanyonSuitcase from './sections/Suitcase/Canyonsuitcase';
 
 function Layout() {
   useSmoothScroll();
@@ -31,9 +30,8 @@ function LandingPage() {
       <main className="content">
         <Hero />
         <Countdown />
-        <CanyonMap />
-        <ApplySuitcase />
-        <CanyonSuitcase />
+        <CanyonMap/>
+        <CanyonSuitcase/>
         <Footer />
       </main>
     </>

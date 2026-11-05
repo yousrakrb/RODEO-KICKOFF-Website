@@ -86,7 +86,7 @@
 
     .canyon-map-artwork-img {
         margin-top: calc(-18.75% + clamp(10px, 2.5vw, 20px));
-        margin-bottom: -27%;
+        margin-bottom: -3%;
     }
 }
 

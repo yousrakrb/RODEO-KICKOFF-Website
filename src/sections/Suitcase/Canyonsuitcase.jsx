@@ -28,8 +28,8 @@ export default function CanyonSuitcase({
     src = "/assets/suitcase/suitcase.glb",
     yeehawSrc = "/assets/suitcase/yeehaw.png",   // the rope "Yeehaw!!" image
     packNowSrc = "/assets/suitcase/packnow.png", // the "Pack your cowboy boots..." image
-    topSpace = -900,            // px above "Yeehaw!!" on desktop / tablet
-    topSpaceMobile = "-350vw",  // above "Yeehaw!!" on phones
+    topSpace = -300,
+    topSpaceMobile = "0px",  // above "Yeehaw!!" on phones
     pinOffsetMobile = 0,        // phones: px. 0 = the pin starts exactly when the title hits the top of the screen.
                                 // Positive = pin starts a bit LATER, negative = a bit EARLIER
     applyUrl = "/apply", // optional: if you don't provide onApply, clicking the bottom half of the open case goes here
