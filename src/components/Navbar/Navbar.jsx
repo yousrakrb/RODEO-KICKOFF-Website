@@ -119,6 +119,15 @@ export default function Navbar() {
                                 </a>
                             </li>
                             <li>
+                                <a
+                                    href="/#explore-canyon"
+                                    onClick={(e) => handleAnchorClick(e, '#explore-canyon')}
+                                    className="desktop-nav-link"
+                                >
+                                    Explore RODEO
+                                </a>
+                            </li>
+                            <li>
                                 <Link
                                     to="/gear"
                                     onClick={closeMenu}
