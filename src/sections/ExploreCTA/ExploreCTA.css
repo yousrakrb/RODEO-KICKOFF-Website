@@ -1,0 +1,57 @@
+/* src/sections/ExploreCTA/ExploreCTA.css */
+
+.explore-cta-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: calc(-4% + clamp(10px, 2vw, 24px));
+    margin-bottom: clamp(1rem, 3vw, 2.5rem);
+    position: relative;
+    z-index: 3;
+}
+
+.explore-cta-link {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    outline: none;
+}
+
+.explore-cta-link:hover {
+    transform: translateY(-4px) scale(1.03);
+}
+
+.explore-cta-link:focus-visible {
+    outline: 2px dashed #f5ebe0;
+    outline-offset: 8px;
+}
+
+.explore-cta-image {
+    width: clamp(280px, 48vw, 560px);
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.5));
+    transition: filter 0.3s ease;
+}
+
+.explore-cta-link:hover .explore-cta-image {
+    filter: drop-shadow(0 18px 38px rgba(0, 0, 0, 0.7));
+}
+
+@media (max-width: 768px) {
+    .explore-cta-container {
+        margin-top: calc(-2% + 10px);
+        margin-bottom: 1.5rem;
+    }
+
+    .explore-cta-image {
+        width: clamp(260px, 78vw, 440px);
+    }
+}

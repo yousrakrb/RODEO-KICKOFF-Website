@@ -1,0 +1,54 @@
+/* src/sections/ApplySuitcase/ApplySuitcase.css */
+
+.apply-suitcase {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100svh; /* real visible height on mobile browsers */
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.suitcase-stage {
+    position: relative;
+    width: min(90%, 500px);
+}
+
+.suitcase-frame {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.apply-button-wrap {
+    position: absolute;
+    bottom: 18%;
+    left: 30%;
+    z-index: 2;
+}
+
+.apply-button {
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    padding: clamp(0.6rem, 1.5vw, 1rem) clamp(1.5rem, 4vw, 2.5rem);
+    background: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+    width: clamp(100px, 20vw, 160px);
+    height: clamp(50px, 10vw, 80px);
+}
+
+/* ---------- Phone layout ---------- */
+@media (max-width: 768px) {
+    .apply-suitcase {
+        align-items: flex-start; /* no more floating in the middle */
+        padding: 0.5rem 0.5rem 1rem;
+    }
+
+    .suitcase-stage {
+        width: 100%; /* use the full phone width */
+        margin-top: 0;
+    }
+}

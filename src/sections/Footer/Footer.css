@@ -1,0 +1,66 @@
+/* src/sections/Footer/Footer.css */
+
+.site-footer {
+    width: 100%;
+    min-height: 180px;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2.5rem 1.5rem;
+    box-sizing: border-box;
+}
+
+.footer-logos {
+    width: min(100%, 650px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(1.5rem, 5vw, 4rem);
+}
+
+.footer-logo {
+    display: block;
+    height: auto;
+    object-fit: contain;
+    max-width: 100%;
+}
+
+.footer-logo-aiesec {
+    width: 25%;
+    max-width: 130px;
+}
+
+.footer-logo-rodeo {
+    width: 30%;
+    max-width: 150px;
+}
+
+.footer-logo-miras {
+    width: 25%;
+    max-width: 120px;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .site-footer {
+        min-height: 140px;
+        padding: 2rem 1rem;
+    }
+
+    .footer-logos {
+        gap: clamp(1rem, 4vw, 1.5rem);
+    }
+
+    .footer-logo-aiesec {
+        width: 27%;
+    }
+
+    .footer-logo-rodeo {
+        width: 32%;
+    }
+
+    .footer-logo-miras {
+        width: 25%;
+    }
+}

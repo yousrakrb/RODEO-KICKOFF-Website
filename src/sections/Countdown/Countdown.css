@@ -1,0 +1,257 @@
+/* src/sections/Countdown/Countdown.css */
+
+.countdown-section {
+    width: min(88%, 980px);
+    margin-inline: auto;
+    padding: clamp(2rem, 5vw, 4rem) 1rem clamp(2rem, 4vw, 3.5rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 2;
+}
+
+.countdown-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: clamp(1.2rem, 3.6vw, 3.6rem);
+    width: 100%;
+    margin-inline: auto;
+    flex-wrap: wrap;
+}
+
+.countdown-pair-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+/* Wooden Pin Clip at top */
+.wooden-pin-wrap {
+    position: relative;
+    z-index: 4;
+    margin-bottom: clamp(35px, 5vw, 55px);
+    display: flex;
+    justify-content: center;
+}
+
+.wooden-pin-img {
+    width: clamp(200px, 26vw, 340px);
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.55));
+    display: block;
+}
+
+/* Two Cards Pair */
+.cards-pair {
+    display: flex;
+    gap: clamp(10px, 2vw, 24px);
+    align-items: flex-start;
+    position: relative;
+}
+
+.countdown-card-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Individual Hanging Card */
+.countdown-card {
+    position: relative;
+    width: clamp(130px, 16vw, 210px);
+    height: clamp(150px, 18vw, 230px);
+    background: linear-gradient(180deg, #f5ebe0 0%, #ebe0ce 100%);
+    border-radius: clamp(14px, 2vw, 22px);
+    box-shadow: 
+        0 14px 30px rgba(0, 0, 0, 0.5),
+        inset 0 0 15px rgba(0, 0, 0, 0.04),
+        inset 0 2px 2px rgba(255, 255, 255, 0.8);
+    border: 1px solid #d9ccb8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+}
+
+/* String connecting from wooden clip to card */
+.card-string {
+    position: absolute;
+    bottom: calc(100% - 15px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: clamp(50px, 7vw, 75px);
+    background: #1f1108;
+    box-shadow: 1px 0 2px rgba(0, 0, 0, 0.6);
+    z-index: 2;
+}
+
+/* Top Punched Hole */
+.card-hole {
+    position: absolute;
+    top: clamp(8px, 1.2vw, 14px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: clamp(8px, 1vw, 12px);
+    height: clamp(8px, 1vw, 12px);
+    border-radius: 50%;
+    background: #24140b;
+    border: 1.5px solid #bbaea0;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
+    z-index: 3;
+}
+
+/* Split Line across card middle */
+.card-split-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background: rgba(45, 26, 12, 0.35);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    z-index: 2;
+}
+
+/* Card Number */
+.card-number-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.card-number {
+    font-family: 'Georgia', 'Playfair Display', 'Times New Roman', serif;
+    font-weight: 900;
+    font-size: clamp(3.2rem, 7.5vw, 7.8rem);
+    color: #26160b;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    user-select: none;
+}
+
+/* PNG Labels Underneath Cards */
+.label-wrap {
+    margin-top: clamp(12px, 1.8vw, 20px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.label-png {
+    height: clamp(16px, 2.2vw, 26px);
+    width: auto;
+    max-width: clamp(80px, 12vw, 140px);
+    object-fit: contain;
+    filter: brightness(0) invert(1) sepia(0.25) saturate(1.5) opacity(0.95);
+    display: block;
+}
+
+/* Bottom Decorative Asset (WhyOurKickoff) */
+.bottom-asset-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: calc(-16.6% + clamp(75px, 8.5vw, 120px));
+    margin-bottom: calc(-12% + clamp(20px, 3vw, 40px));
+    position: relative;
+    z-index: 1;
+}
+
+.bottom-asset-image {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.45));
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.bottom-asset-image:hover {
+    transform: translateY(-4px) scale(1.01);
+}
+
+/* =========================================
+   PHONE: all four cards in ONE row
+   (everything scales with screen width)
+   ========================================= */
+@media (max-width: 768px) {
+    .countdown-section {
+        width: 100%;
+        padding: clamp(1.5rem, 4vw, 2.5rem) 2vw;
+    }
+
+    /* one row, never wraps */
+    .countdown-container {
+        flex-wrap: nowrap;
+        gap: 3vw;
+        justify-content: center;
+    }
+
+    .cards-pair {
+        gap: 2vw;
+    }
+
+    /* clip sits over each pair of cards */
+    .wooden-pin-img {
+        width: 30vw;
+    }
+
+    .wooden-pin-wrap {
+        margin-bottom: calc(9vw - 10px);
+    }
+
+    /* smaller cards */
+    .countdown-card {
+        width: 19vw;
+        height: 22vw;
+        border-radius: 3vw;
+    }
+
+    .card-number {
+        font-size: 9.5vw;
+    }
+
+    .card-hole {
+        top: 1.6vw;
+        width: 1.6vw;
+        height: 1.6vw;
+        min-width: 5px;
+        min-height: 5px;
+        border-width: 1px;
+    }
+
+    .card-string {
+        bottom: calc(100% - 8px);
+        height: 9vw;
+    }
+
+    .card-split-line {
+        height: 1px;
+    }
+
+    /* smaller labels */
+    .label-wrap {
+        margin-top: 2vw;
+    }
+
+    .label-png {
+        height: 3vw;
+        min-height: 9px;
+        max-width: 18vw;
+    }
+
+    .bottom-asset-container {
+        margin-top: calc(-15% + clamp(35px, 6vw, 55px));
+        margin-bottom: calc(-10% + 20px);
+    }
+}

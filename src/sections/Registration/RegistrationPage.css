@@ -1,0 +1,741 @@
+﻿/* Fonts: swap "Yellowtail" / "Special Elite" for the ones used on your landing page */
+@import url("https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Special+Elite&family=Rye&display=swap");
+
+/* Algerian is a Monotype font: it only exists on computers that have it installed
+   (Windows/Office). To show it to every visitor, you need a licensed web-font file:
+   put it in src/fonts/ and add:  url("./fonts/ALGER.woff2") format("woff2")  after local(). */
+@font-face {
+    font-family: "Algerian";
+    src: local("Algerian"), local("ALGER");
+    font-display: swap;
+}
+
+:root {
+    --font-script: "Algerian", "Cinzel Decorative", "Rye", serif;
+    --bg: #2a1608;
+    --bg-deep: #1c0e05;
+    --parchment: #f1e3c3;
+    --paper: #d9c7a3;
+    --leather: #7b4a29;
+    --leather-dark: #5a3219;
+    --stitch: #e8cf8f;
+    --ink: #3b2412;
+    --rust: #b5471f;
+    --rust-dark: #8e3512;
+    --gold: #d9a21b;
+    --sage: #7a8b5b;
+    --danger: #ffb4a0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.rodeo-page {
+    min-height: 100vh;
+    padding: clamp(88px, 11vw, 112px) 16px 64px;
+    color: var(--parchment);
+    font-family: "Special Elite", "Courier New", monospace;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(120, 70, 30, 0.35), transparent 60%),
+        radial-gradient(ellipse at 50% 100%, rgba(0, 0, 0, 0.5), transparent 60%),
+        var(--bg);
+}
+
+/* Apple emoji images */
+.emoji {
+    display: inline-block;
+    width: 1.15em;
+    height: 1.15em;
+    vertical-align: -0.2em;
+}
+
+/* ---------- header ---------- */
+.page-head {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 28px;
+}
+
+.back-home {
+    color: var(--paper);
+    font-size: 14px;
+    text-decoration: none;
+    opacity: 0.8;
+}
+
+.back-home:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+.script-title {
+    font-family: var(--font-script);
+    font-weight: 400;
+    font-size: clamp(40px, 4vw, 68px);
+    margin: 12px 0 4px;
+    color: var(--parchment);
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+}
+
+.lead {
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* ---------- layout ---------- */
+.layout {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 24px;
+    align-items: start;
+}
+
+/* ---------- leather card with stitched border ---------- */
+.leather-card {
+    position: relative;
+    padding: 32px 28px;
+    border-radius: 22px;
+    color: var(--parchment);
+    background:
+        radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.08), transparent 45%),
+        radial-gradient(circle at 80% 90%, rgba(0, 0, 0, 0.25), transparent 50%),
+        repeating-radial-gradient(circle at 30% 30%, rgba(0, 0, 0, 0.04) 0 1px, transparent 1px 3px),
+        var(--leather);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55), inset 0 0 0 3px var(--leather-dark);
+}
+
+.leather-card::before {
+    content: "";
+    position: absolute;
+    inset: 10px;
+    border: 2px dashed var(--stitch);
+    border-radius: 14px;
+    pointer-events: none;
+    opacity: 0.85;
+}
+
+/* ---------- progress ---------- */
+.progress {
+    margin-bottom: 20px;
+}
+
+.trail {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.dot {
+    position: relative;
+    flex: 1;
+    height: 0;
+    border-top: 3px dotted rgba(241, 227, 195, 0.35);
+}
+
+.dot:last-child {
+    flex: 0;
+}
+
+.dot::after {
+    content: "";
+    position: absolute;
+    right: -6px;
+    top: -9px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--leather-dark);
+    border: 2px solid rgba(241, 227, 195, 0.4);
+}
+
+.dot.past {
+    border-top-color: var(--gold);
+}
+
+.dot.past::after {
+    background: var(--gold);
+    border-color: var(--gold);
+}
+
+.dot.current::after {
+    width: 22px;
+    height: 22px;
+    top: -13px;
+    right: -10px;
+    background: var(--rust);
+    border-color: var(--gold);
+    font-size: 13px;
+    line-height: 18px;
+    text-align: center;
+    color: var(--gold);
+}
+
+.progress-text {
+    margin: 14px 0 0;
+    font-size: 13px;
+    opacity: 0.8;
+    letter-spacing: 0.08em;
+}
+
+/* ---------- titles ---------- */
+.step-title {
+    font-family: var(--font-script);
+    font-weight: 400;
+    font-size: clamp(32px, 6vw, 44px);
+    margin: 6px 0 0;
+}
+
+.step-sub {
+    margin: 4px 0 24px;
+    opacity: 0.85;
+}
+
+/* ---------- fields ---------- */
+.field {
+    margin-bottom: 22px;
+}
+
+.field-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+.field-hint {
+    margin: -2px 0 8px;
+    font-size: 13px;
+    opacity: 0.75;
+}
+
+.field-error {
+    margin: 8px 0 0;
+    color: var(--danger);
+    font-size: 14px;
+}
+
+.has-error input,
+.has-error textarea {
+    border-color: var(--danger);
+}
+
+input,
+textarea {
+    width: 100%;
+    padding: 13px 14px;
+    font: inherit;
+    font-size: 16px;
+    /* prevents zoom on iOS */
+    color: var(--ink);
+    background: var(--parchment);
+    border: 2px solid #4a2c17;
+    border-radius: 6px;
+    outline: none;
+    transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+input:focus,
+textarea:focus {
+    border-color: var(--rust);
+    box-shadow: 0 4px 0 -1px var(--rust);
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* ---------- chips ---------- */
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.chip {
+    min-height: 44px;
+    padding: 10px 18px;
+    font: inherit;
+    color: var(--parchment);
+    background: rgba(0, 0, 0, 0.22);
+    border: 2px solid rgba(241, 227, 195, 0.4);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.15s;
+}
+
+.chip:hover {
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.chip.active {
+    background: var(--parchment);
+    color: var(--ink);
+    border-color: var(--gold);
+    transform: translateY(-1px);
+}
+
+/* ---------- big origin choices ---------- */
+.big-choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.big-choice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 22px 12px;
+    font: inherit;
+    text-align: center;
+    color: var(--ink);
+    background: var(--paper);
+    border: 3px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.35);
+    transition: transform 0.12s;
+}
+
+.big-choice:hover {
+    transform: translateY(-2px) rotate(-0.5deg);
+}
+
+.big-choice.active {
+    border-color: var(--rust);
+    background: var(--parchment);
+}
+
+.big-choice-emoji {
+    font-size: 38px;
+}
+
+.big-choice-title {
+    font-family: "Rye", serif;
+    font-size: 18px;
+}
+
+.big-choice-text {
+    font-size: 13px;
+}
+
+/* ---------- pass cards (wanted posters) ---------- */
+.passes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.pass-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 26px 14px 20px;
+    font: inherit;
+    color: var(--ink);
+    background: var(--paper);
+    border: 0;
+    cursor: pointer;
+    clip-path: polygon(0 3%, 6% 0, 14% 2%, 24% 0, 36% 2%, 48% 0, 60% 2%, 72% 0, 84% 2%, 94% 0, 100% 3%,
+            100% 97%, 94% 100%, 84% 98%, 72% 100%, 60% 98%, 48% 100%, 36% 98%, 24% 100%, 14% 98%, 6% 100%, 0 97%);
+    transition: transform 0.15s, filter 0.15s;
+    filter: saturate(0.85);
+}
+
+
+.file-drop-thumb {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    object-fit: cover;
+    margin-right: 0.6rem;
+    vertical-align: middle;
+    border: 1px solid rgba(243, 227, 195, 0.3);
+}
+
+.file-drop {
+    margin-top: 0.75rem;
+}
+
+.field a.link-btn {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+}
+
+
+
+.pass-card:hover {
+    transform: translateY(-4px);
+}
+
+.pass-card.active {
+    filter: none;
+    background: var(--parchment);
+    outline: 4px solid var(--rust);
+    outline-offset: -8px;
+}
+
+.pass-label {
+    font-family: "Rye", serif;
+    letter-spacing: 0.2em;
+    font-size: 13px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 2px;
+}
+
+.pass-emoji {
+    font-size: 40px;
+    margin: 10px 0 4px;
+}
+
+.pass-name {
+    font-family: "Rye", serif;
+    font-size: 17px;
+    line-height: 1.15;
+}
+
+.pass-tagline {
+    font-size: 12px;
+    margin: 6px 0 10px;
+    opacity: 0.8;
+}
+
+.pass-card ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.pass-bounty {
+    background: #e6cf93;
+}
+
+.pass-card.pass-wanted {
+    background: #ecd9a8;
+}
+
+.ribbon {
+    position: absolute;
+    top: 14px;
+    right: -30px;
+    width: 120px;
+    padding: 3px 0;
+    transform: rotate(40deg);
+    background: var(--rust);
+    color: var(--parchment);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+}
+
+/* ---------- notice ---------- */
+.notice {
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    background: rgba(0, 0, 0, 0.28);
+    border-left: 5px solid var(--gold);
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.notice p {
+    margin: 6px 0 0;
+}
+
+/* ---------- hype ---------- */
+.hype {
+    display: flex;
+    gap: 8px;
+}
+
+.hype-btn {
+    font-size: 32px;
+    padding: 4px 6px;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    filter: grayscale(1) opacity(0.45);
+    transition: transform 0.1s, filter 0.15s;
+}
+
+.hype-btn.on {
+    filter: none;
+    transform: scale(1.1);
+}
+
+.hype-scale {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 4px;
+    max-width: 260px;
+}
+
+/* ---------- nav / buttons ---------- */
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.link-btn {
+    background: none;
+    border: 0;
+    color: var(--parchment);
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    opacity: 0.85;
+    padding: 10px 4px;
+}
+
+.wood-btn {
+    min-height: 48px;
+    padding: 12px 28px;
+    font-family: "Rye", serif;
+    font-size: 16px;
+    letter-spacing: 0.04em;
+    color: var(--parchment);
+    background: linear-gradient(180deg, #c9582b, var(--rust) 50%, var(--rust-dark));
+    border: 2px solid #5a1f0a;
+    border-radius: 8px;
+    box-shadow: 0 5px 0 #4a1a09, 0 10px 14px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.wood-btn:hover {
+    transform: translateY(-1px);
+}
+
+.wood-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 #4a1a09;
+}
+
+.wood-btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+/* ---------- summary ---------- */
+.summary {
+    position: sticky;
+    top: 20px;
+}
+
+.paper {
+    padding: 22px 18px;
+    color: var(--ink);
+    background: var(--paper);
+    transform: rotate(1.2deg);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    clip-path: polygon(0 2%, 8% 0, 20% 2%, 35% 0, 50% 2%, 65% 0, 80% 2%, 92% 0, 100% 2%, 100% 98%, 90% 100%, 75% 98%, 60% 100%, 45% 98%, 30% 100%, 15% 98%, 0 100%);
+}
+
+.paper h3 {
+    font-family: "Rye", serif;
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+.sum-pass {
+    font-weight: bold;
+    margin: 0 0 6px;
+}
+
+.paper ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 8px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.sum-line {
+    font-size: 13px;
+    margin: 6px 0 0;
+}
+
+/* ---------- success ---------- */
+.success {
+    max-width: 620px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.ticket {
+    margin: 22px auto;
+    padding: 22px;
+    color: var(--ink);
+    background: var(--parchment);
+    transform: rotate(-1.5deg);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+.ticket-stamp {
+    font-family: "Rye", serif;
+    letter-spacing: 0.25em;
+    color: var(--rust);
+    border: 3px solid var(--rust);
+    padding: 2px 10px;
+    display: inline-block;
+    transform: rotate(-4deg);
+}
+
+.ticket-name {
+    font-family: var(--font-script);
+    font-size: 34px;
+    margin: 10px 0 0;
+}
+
+.ticket-pass {
+    font-family: "Rye", serif;
+    margin: 4px 0;
+}
+
+.ticket-line {
+    margin: 0;
+    font-size: 14px;
+}
+
+.next-steps {
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.6;
+    padding-left: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 860px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .summary {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        z-index: 20;
+    }
+
+    .summary .paper {
+        transform: none;
+        clip-path: none;
+        padding: 10px 16px;
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        flex-wrap: wrap;
+        border-top: 3px solid var(--rust);
+    }
+
+    .paper h3,
+    .paper ul,
+    .sum-line {
+        display: none;
+    }
+
+    .paper .sum-pass {
+        margin: 0;
+    }
+
+    .rodeo-page {
+        padding-bottom: 96px;
+    }
+}
+
+@media (max-width: 640px) {
+
+    .passes,
+    .big-choices {
+        grid-template-columns: 1fr;
+    }
+
+    .leather-card {
+        padding: 26px 18px;
+    }
+
+    .pass-card {
+        padding-bottom: 24px;
+    }
+}
+
+
+/* ------------------------------------------------------------------ */
+/* Styles added for the success / downloads UI                          */
+/* ------------------------------------------------------------------ */
+
+/* -- sum-price (sidebar ticket summary) -- */
+.sum-price {
+    font-family: "Rye", serif;
+    font-size: 20px;
+    color: var(--rust);
+    margin: 10px 0 0;
+}
+
+/* -- downloads section header -- */
+.downloads {
+    margin-top: 32px;
+    text-align: center;
+}
+
+.downloads h3 {
+    font-family: "Rye", serif;
+    font-size: 20px;
+    margin: 0 0 20px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+
+/* -- invoice download row -- */
+.download-row {
+    margin-bottom: 28px;
+}
+
+/* -- next-steps list spacing -- */
+.next-steps {
+    margin-top: 24px;
+    margin-bottom: 28px;
+}
+
+.next-steps li {
+    margin-bottom: 10px;
+}
+
+/* -- general breathing room between buttons / hints -- */
+.wood-btn + .field-hint,
+.wood-btn + .wood-btn {
+    margin-top: 16px;
+}
+
+.field-hint + .wood-btn {
+    margin-top: 12px;
+}
+
+/* -- bottom sign-off -- */
+.success > .field-hint:last-child {
+    margin-top: 32px;
+    font-size: 15px;
+    opacity: 0.75;
+    letter-spacing: 0.04em;
+}

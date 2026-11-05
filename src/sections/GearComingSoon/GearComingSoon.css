@@ -1,0 +1,133 @@
+.gear-coming-soon {
+    display: flex;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: max(112px, calc(env(safe-area-inset-top) + 96px)) 6vw 48px;
+    color: #ead8bb;
+    background:
+        radial-gradient(ellipse at 18% 44%, rgba(128, 69, 29, 0.2), transparent 42%),
+        radial-gradient(ellipse at 86% 76%, rgba(92, 48, 23, 0.22), transparent 38%),
+        #1c0e05;
+}
+
+.gear-coming-soon__content {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+    align-items: center;
+    gap: clamp(32px, 6vw, 88px);
+    width: min(1120px, 100%);
+    margin: auto;
+}
+
+.gear-coming-soon__logo {
+    display: block;
+    width: 100%;
+    max-height: 68vh;
+    object-fit: contain;
+    filter: drop-shadow(0 22px 34px rgba(0, 0, 0, 0.34));
+    transform: rotate(-2deg);
+}
+
+.gear-coming-soon__copy {
+    padding: 8px 0 8px 32px;
+    border-left: 1px solid rgba(217, 162, 27, 0.45);
+}
+
+.gear-coming-soon__eyebrow {
+    margin: 0 0 16px;
+    color: #d9a21b;
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.gear-coming-soon__copy h1 {
+    margin: 0;
+    color: #f1e3c3;
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1.08;
+}
+
+.gear-coming-soon__message {
+    max-width: 34ch;
+    margin: 18px 0 30px;
+    color: rgba(241, 227, 195, 0.76);
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+}
+
+.gear-coming-soon__back {
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+    gap: 10px;
+    padding: 0 18px;
+    color: #f1e3c3;
+    background: rgba(217, 162, 27, 0.08);
+    border: 1px solid rgba(217, 162, 27, 0.5);
+    border-radius: 4px;
+    font: 600 14px "Space Grotesk", sans-serif;
+    cursor: pointer;
+    transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.gear-coming-soon__back:hover {
+    transform: translateY(-2px);
+    background: rgba(217, 162, 27, 0.16);
+    border-color: #d9a21b;
+}
+
+.gear-coming-soon__back:focus-visible {
+    outline: 2px solid #f1e3c3;
+    outline-offset: 3px;
+}
+
+.gear-coming-soon__back span {
+    color: #d9a21b;
+    font-size: 20px;
+    line-height: 1;
+}
+
+@media (max-width: 700px) {
+    .gear-coming-soon {
+        padding: max(104px, calc(env(safe-area-inset-top) + 88px)) 24px 40px;
+    }
+
+    .gear-coming-soon__content {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+        max-width: 480px;
+    }
+
+    .gear-coming-soon__logo {
+        width: min(100%, 400px);
+        max-height: 38vh;
+        margin: 0 auto;
+    }
+
+    .gear-coming-soon__copy {
+        padding: 20px 0 0;
+        border-top: 1px solid rgba(217, 162, 27, 0.45);
+        border-left: 0;
+        text-align: center;
+    }
+
+    .gear-coming-soon__copy h1 {
+        font-size: 42px;
+    }
+
+    .gear-coming-soon__message {
+        margin: 14px auto 24px;
+        font-size: 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gear-coming-soon__back {
+        transition: none;
+    }
+}

@@ -1,0 +1,41 @@
+/* src/sections/WhyKickoff/WhyKickoff.css */
+.why-kickoff {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: clamp(2rem, 5vw, 4rem) 1.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.why-kickoff-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 820px;
+}
+
+.why-kickoff-image {
+    width: 100%;
+    max-width: 780px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.45));
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: block;
+}
+
+.why-kickoff-image:hover {
+    transform: translateY(-5px) scale(1.015);
+}
+
+@media (max-width: 768px) {
+    .why-kickoff {
+        padding: clamp(1.5rem, 4vw, 2.5rem) 1rem;
+    }
+
+    .why-kickoff-image {
+        max-width: 100%;
+    }
+}

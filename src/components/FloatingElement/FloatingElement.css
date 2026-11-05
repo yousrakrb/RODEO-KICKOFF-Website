@@ -1,0 +1,17 @@
+/* src/components/FloatingElement/FloatingElement.css */
+.floating-element {
+    display: inline-block;
+    animation: idleFloat 3.5s ease-in-out infinite;
+}
+
+@keyframes idleFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}

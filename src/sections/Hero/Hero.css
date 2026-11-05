@@ -1,0 +1,37 @@
+/* src/sections/Hero/Hero.css */
+
+.hero {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: clamp(56px, 5vw, 64px);
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    margin: 0;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.hero-image {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-beige-image {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    height: auto;
+    object-fit: cover;
+    display: block;
+}
+
+

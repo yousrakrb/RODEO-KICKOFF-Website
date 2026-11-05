@@ -1,0 +1,62 @@
+/* src/components/FlipDigit/FlipDigit.css */
+.flip-digit {
+    position: relative;
+    width: clamp(32px, 8vw, 70px);
+    height: clamp(42px, 10vw, 90px);
+    background: #f3ead9;
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: clamp(1.2rem, 4vw, 2.8rem);
+    font-weight: bold;
+    color: #3b2a1e;
+}
+
+.flip-digit-static,
+.flip-top,
+.flip-bottom {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flip-top {
+    overflow: hidden;
+    height: 50%;
+    align-items: flex-start;
+    animation: flipTop 0.3s ease-in forwards;
+    transform-origin: bottom;
+}
+
+.flip-bottom {
+    overflow: hidden;
+    top: 50%;
+    height: 50%;
+    align-items: flex-end;
+    animation: flipBottom 0.3s ease-out 0.15s forwards;
+    transform-origin: top;
+    opacity: 0;
+}
+
+@keyframes flipTop {
+    from {
+        transform: rotateX(0deg);
+    }
+
+    to {
+        transform: rotateX(-90deg);
+    }
+}
+
+@keyframes flipBottom {
+    from {
+        transform: rotateX(90deg);
+        opacity: 1;
+    }
+
+    to {
+        transform: rotateX(0deg);
+        opacity: 1;
+    }
+}
