@@ -382,12 +382,12 @@ export default function RegistrationPage() {
             conduct_policy_filename: form.conductPolicyFile?.name || "",
             photo_filename: form.photoFile?.name || "",
             photo_mime_type: form.photoFile?.type || "image/jpeg",
-
         };
 
         try {
-            // --- Step 1: invoice (critical — if this fails, we stop here,
-            // since the sheet row depends on having the PDF to attach) ---
+            // --- Step 1: build everything the payload needs (invoice PDF,
+            // photo, conduct policy) — nothing is downloaded or shown to the
+            // user yet, this is all just preparing data to send ---
             const blob = await generateInvoice({
                 name: form.fullName,
                 lc: form.fromConstantine ? "Constantine" : form.lc,
@@ -400,24 +400,34 @@ export default function RegistrationPage() {
             setInvoiceBlob(blob);
 
             const invoiceFilename = `rodeo-kickoff-invoice-${form.fullName.replace(/\s+/g, "_")}.pdf`;
-            downloadBlob(blob, invoiceFilename);
-
             payload.invoice_pdf_base64 = await blobToBase64(blob);
             payload.invoice_filename = invoiceFilename;
 
             payload.photo_base64 = await fileToDataUrl(form.photoFile);
             payload.conduct_policy_base64 = await fileToDataUrl(form.conductPolicyFile);
 
-            // --- Step 2: send to the sheet (critical) ---
-            // text/plain avoids a CORS preflight, which Apps Script does not answer.
-            // no-cors means we can't read the reply, so a thrown error = network failure
-            // (including SHEET_URL still being a placeholder string, not a real URL).
-            await fetch(SHEET_URL, {
+            // --- Step 2: submit to the sheet FIRST, before anything that
+            // could interrupt page execution. iOS Safari in particular can
+            // suspend a page's JavaScript when a file download/preview is
+            // triggered — so the critical network request must complete
+            // BEFORE we ever call downloadBlob() below. mode: 'no-cors' was
+            // removed so we can actually read whether this succeeded. ---
+            const response = await fetch(SHEET_URL, {
                 method: "POST",
-                mode: "no-cors",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify(payload),
             });
+
+            const result = await response.json();
+            if (!result.ok) {
+                throw new Error(result.error || "Submission failed");
+            }
+
+            // --- Step 3: ONLY now, after the sheet row is confirmed written,
+            // trigger the invoice download — safe even if iOS interrupts
+            // execution right after this point, since the critical part
+            // already succeeded ---
+            downloadBlob(blob, invoiceFilename);
 
             sessionStorage.removeItem(STORAGE_KEY);
             sessionStorage.removeItem(STEP_KEY);
