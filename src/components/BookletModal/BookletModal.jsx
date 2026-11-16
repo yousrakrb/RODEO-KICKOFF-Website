@@ -2,8 +2,8 @@
 import { useEffect } from 'react';
 import './BookletModal.css';
 
-const INTERNAL_BOOKLET_URL = "https://YOUR_INTERNAL_SHERIFF_BOOKLET_LINK";
-const EXTERNAL_BOOKLET_URL = "https://YOUR_EXTERNAL_STRANGER_BOOKLET_LINK";
+const INTERNAL_BOOKLET_URL = "https://drive.google.com/file/d/1kI992Mr5_cXzFj17rt3ShfQ-YLyKqCQo/view?usp=sharing";
+const EXTERNAL_BOOKLET_URL = "https://drive.google.com/file/d/1ryIhEwUG3TE9hONft_EQPuzJznbMLILE/view?usp=sharing";
 
 export default function BookletModal({ isOpen, onClose }) {
   useEffect(() => {
