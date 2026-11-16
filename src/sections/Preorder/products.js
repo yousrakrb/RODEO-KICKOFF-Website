@@ -1,3 +1,4 @@
+// src/sections/Preorder/products.js
 export const PRODUCTS = [
   {
     id: "cirta-shirt",
@@ -10,7 +11,6 @@ export const PRODUCTS = [
       "public/assets/pre-order/aic-shirt2.jpg",
       "public/assets/pre-order/aic-shirt3.jpg",
       "public/assets/pre-order/aic-shirt4.jpg",
-
     ],
   },
   {
@@ -20,8 +20,8 @@ export const PRODUCTS = [
     price: 1500,
     sizes: [],
     images: [
-      "public/assets/pre-order/aic-cap1.jpg",
-      "public/assets/pre-order/aic-cap2.jpg",
+      "public/assets/pre-order/aic-cap1.png",
+      "public/assets/pre-order/aic-cap2.png",
     ],
   },
   {
