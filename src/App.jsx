@@ -7,12 +7,14 @@ import CanyonMap from './sections/CanyonMap/CanyonMap';
 import Footer from './sections/Footer/Footer';
 import RegistrationPage from './sections/Registration/RegistrationPage';
 import PreOrder from './sections/Preorder/Preorder';
-import GearComingSoon from './sections/GearComingSoon/GearComingSoon';
+import ProductDetail from './sections/Preorder/ProductDetail';
 import Navbar from './components/Navbar/Navbar';
 import { useSmoothScroll } from './hooks/useSmoothScroll';
 import CanyonSuitcase from './sections/Suitcase/Canyonsuitcase';
+import GearBanner from './sections/GearBanner/GearBanner';
 import MusicPlayer from './components/MusicPlayer/MusicPlayer';
 
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwRs-uIq35mOa9U04sI2DK4612Jkt7-WNf0L28YHALXVWNnvVb9ygjdhZIOwI4bcWSN/exec";
 
 function Layout() {
   useSmoothScroll();
@@ -22,6 +24,7 @@ function Layout() {
       <Navbar />
       <MusicPlayer />
       <Outlet />
+      <Footer />
     </>
   );
 }
@@ -33,9 +36,9 @@ function LandingPage() {
       <main className="content">
         <Hero />
         <Countdown />
-        <CanyonMap/>
-        <CanyonSuitcase/>
-        <Footer />
+        <CanyonMap />
+        <CanyonSuitcase />
+        <GearBanner />
       </main>
     </>
   );
@@ -47,8 +50,11 @@ function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/apply" element={<RegistrationPage />} />
-        <Route path="/gear" element={<GearComingSoon />} />
-        <Route path="/preorder" element={<PreOrder />} />
+        <Route
+          path="/preorder"
+          element={<PreOrder sheetUrl={"https://script.google.com/macros/s/AKfycbwRs-uIq35mOa9U04sI2DK4612Jkt7-WNf0L28YHALXVWNnvVb9ygjdhZIOwI4bcWSN/exec"} logoUrl="/assets/invoice/aiesec-logo.png" />}
+        />
+        <Route path="/preorder/:productId" element={<ProductDetail />} />
       </Route>
     </Routes>
   );

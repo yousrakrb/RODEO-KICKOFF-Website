@@ -1,5 +1,5 @@
 // src/utils/getTimeLeft.js
-const TARGET_DATE = new Date('2026-11-20T00:00:00');
+const TARGET_DATE = new Date('2026-11-27T00:00:00');
 
 export function getTimeLeft() {
     const diff = Math.max(0, TARGET_DATE - new Date());

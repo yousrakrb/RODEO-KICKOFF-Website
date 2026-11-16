@@ -1,0 +1,158 @@
+/* src/components/BookletModal/BookletModal.css */
+
+.booklet-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(14, 8, 4, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: bookletFadeIn 0.25s ease;
+}
+
+@keyframes bookletFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.booklet-modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  padding: clamp(1.75rem, 4vw, 2.5rem) clamp(1.25rem, 3.5vw, 2rem);
+  border-radius: 22px;
+  text-align: center;
+  color: #f1e3c3;
+  font-family: "Special Elite", "Courier New", monospace;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.08), transparent 45%),
+    radial-gradient(circle at 80% 90%, rgba(0, 0, 0, 0.3), transparent 50%),
+    #7b4a29;
+  box-shadow:
+    0 20px 45px rgba(0, 0, 0, 0.65),
+    inset 0 0 0 3px #5a3219;
+}
+
+.booklet-modal-card::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border: 2px dashed #e8cf8f;
+  border-radius: 14px;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.booklet-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(241, 227, 195, 0.35);
+  background: rgba(0, 0, 0, 0.25);
+  color: #f1e3c3;
+  font-size: 15px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.booklet-modal-close:hover {
+  background: #b5471f;
+  transform: rotate(90deg);
+}
+
+.booklet-modal-kicker {
+  margin: 0 0 6px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #d9a21b;
+}
+
+.booklet-modal-title {
+  margin: 0 0 8px;
+  font-family: "Algerian", "Cinzel Decorative", "Rye", serif;
+  font-weight: 400;
+  font-size: clamp(26px, 5vw, 38px);
+  color: #f1e3c3;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+}
+
+.booklet-modal-sub {
+  margin: 0 0 22px;
+  font-size: 14px;
+  opacity: 0.88;
+}
+
+.booklet-choices {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.booklet-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 22px 14px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #3b2412;
+  background: #d9c7a3;
+  border: 3px solid transparent;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.booklet-choice:hover {
+  background: #f1e3c3;
+  border-color: #b5471f;
+  transform: translateY(-3px);
+}
+
+.booklet-choice:active {
+  transform: translateY(1px);
+}
+
+.booklet-choice-badge {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #b5471f;
+  color: #f1e3c3;
+}
+
+.booklet-choice-title {
+  font-family: "Rye", serif;
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+.booklet-choice-desc {
+  font-size: 13px;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+
+@media (max-width: 560px) {
+  .booklet-choices {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,12 +1,12 @@
 // ---- Edit these values ------------------------------------------------------
 
 // Paste your deployed Google Apps Script Web App URL here (see README.md)
-export const SHEET_URL = "https://script.google.com/macros/s/AKfycbwhGlGSZCtPVjvmPd3wHnZJ_mUK-lcuGwc5LMryLCF3Lzeu6YE4FiVKlzy1f8MoPCPZ/exec";
+export const SHEET_URL = "https://script.google.com/macros/s/AKfycbwRs-uIq35mOa9U04sI2DK4612Jkt7-WNf0L28YHALXVWNnvVb9ygjdhZIOwI4bcWSN/exec";
 export const SHEET_ID = "1jn1Y63GEsg6-53aZLomtYrVOPT3zDigwSXYjF7UkRhs";
 export const SHEET_NAME = "Registrations";
 export const Drive_URL = "https://drive.google.com/drive/folders/1qNr9TcJce4nEkXvQFVi8vjKXP0DcSPYy?usp=sharing";
 
-export const LCS = ["Babez", "Bennak", "Bejaia", "Blida", "Oran", "Tlemcen", "MC"];
+export const LCS = ["Babez", "Bennak", "Bejaia", "Blida", "Oran", "Tlemcen", "OE Sidi Bel Abbès", "MC"];
 export const PICKUP_POINTS = ["Zouaghi", "4 Chemins", "El Khroub"];
 
 export const POSITIONS = ["LCP", "VP", "TL", "Member", "Alumni", "MC"];
@@ -73,7 +73,7 @@ export function getDelegatePrice(form) {
 // ---- Transportation notices ---------------------------------------------------
 
 export const TRANSPORT_NOTICE_EXTERNAL =
-    "Transportation fees for externals will be decided and communicated later.";
+    "Transportation fees will be communicated later.";
 
 export const TRANSPORT_NOTICE_LOCAL_RETURN =
     "If return transportation is provided for your chosen day(s), additional transportation fees will apply.";

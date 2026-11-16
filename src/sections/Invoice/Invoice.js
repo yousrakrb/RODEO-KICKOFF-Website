@@ -1,101 +1,219 @@
-import { jsPDF } from "jspdf"; // npm i jspdf
+import jsPDF from "jspdf";
 
-// Same palette as the site (RGB)
-const BROWN = [40, 23, 0];
-const COPPER = [200, 112, 42];
-const CREAM = [233, 214, 180];
-
-const money = (n) => `${Number(n).toLocaleString("en-US")} DZD`;
+function loadImageAsDataURL(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+      resolve({
+        dataUrl: canvas.toDataURL("image/png"),
+        width: img.width,
+        height: img.height,
+      });
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
 
 export function makeInvoiceNumber() {
-    const d = new Date();
-    const p = (n) => String(n).padStart(2, "0");
-    return `RK-${String(d.getFullYear()).slice(2)}${p(d.getMonth() + 1)}${p(d.getDate())}-${Math.floor(1000 + Math.random() * 9000)}`;
+  const now = new Date();
+  const stamp = now.toISOString().replace(/[-:T.]/g, "").slice(0, 14);
+  const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `RK-${stamp}-${rand}`;
 }
 
-// loads an image from your site (e.g. "/assets/logo.png") so it can be drawn on the PDF. Fails silently.
-async function loadImage(url) {
+export async function generateInvoice({
+  number,
+  customer,
+  lines,
+  conferenceFee,
+  total,
+  logoUrl = "/assets/invoice/aiesec-logo.png",
+}) {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const pageWidth = 210;
+  const margin = 20;
+  const rightEdge = pageWidth - margin;
+
+  // --- Top-Left AIESEC Logo ---
+  if (logoUrl) {
     try {
-        const blob = await (await fetch(url)).blob();
-        const dataUrl = await new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(blob); });
-        const dims = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res({ w: i.width, h: i.height }); i.onerror = rej; i.src = dataUrl; });
-        return { dataUrl, ...dims };
-    } catch { return null; }
-}
+      const resolvedLogo = logoUrl.startsWith("http")
+        ? logoUrl
+        : `${import.meta.env.BASE_URL || "/"}${logoUrl.replace(/^\//, "")}`;
+      const { dataUrl, width, height } = await loadImageAsDataURL(resolvedLogo);
+      const logoWidth = 52;
+      const logoHeight = (height / width) * logoWidth;
+      doc.addImage(dataUrl, "PNG", margin, 14, logoWidth, logoHeight);
+    } catch {
+      doc.setFontSize(18);
+      doc.setFont(undefined, "bold");
+      doc.setTextColor(3, 126, 243);
+      doc.text("AIESEC", margin, 24);
+    }
+  }
 
-/**
- * Builds the invoice (facture) PDF in the browser.
- * lines: [{ name, size, qty, price }]   conferenceFee: number | null
- * returns { blob, base64, filename }
- */
-export async function generateInvoice({ number, date = new Date(), customer, lines, conferenceFee, total, logoUrl }) {
-    const doc = new jsPDF({ unit: "mm", format: "a4" });
-    const W = 210, M = 16;
+  // --- Top-Right Date & Location ---
+  const today = new Date();
+  const dateStr = `${String(today.getDate()).padStart(2, "0")}/${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}/${today.getFullYear()}`;
 
-    // --- header band ---
-    doc.setFillColor(...BROWN); doc.rect(0, 0, W, 40, "F");
-    doc.setFillColor(...COPPER); doc.rect(0, 40, W, 1.4, "F");
-    const logo = logoUrl ? await loadImage(logoUrl) : null;
-    if (logo) { const h = 24, w = (logo.w / logo.h) * h; doc.addImage(logo.dataUrl, "PNG", M, 8, w, h); }
-    doc.setTextColor(...CREAM);
-    doc.setFont("times", "bold"); doc.setFontSize(26); doc.text("FACTURE", W - M, 19, { align: "right" });
-    doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-    doc.text(`N° ${number}`, W - M, 27, { align: "right" });
-    doc.text(date.toLocaleDateString("fr-DZ"), W - M, 33, { align: "right" });
+  doc.setFontSize(10.5);
+  doc.setFont(undefined, "normal");
+  doc.setTextColor(0, 0, 0);
+  doc.text(dateStr, rightEdge, 20, { align: "right" });
+  doc.text("Constantine, Algeria", rightEdge, 26, { align: "right" });
 
-    // --- issuer + customer ---
-    let y = 56;
-    doc.setTextColor(...BROWN);
-    doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(...COPPER);
-    doc.text("ISSUED BY", M, y); doc.text("BILLED TO", W / 2 + 6, y);
-    doc.setTextColor(...BROWN); doc.setFontSize(11);
-    y += 6;
-    doc.setFont("helvetica", "bold"); doc.text("AIESEC in Constantine", M, y);
-    doc.text(customer.fullName || "-", W / 2 + 6, y);
-    doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-    doc.text("Rodeo Kick Off", M, y + 6);
-    doc.text("Constantine, Algeria", M, y + 12);
-    const right = [customer.email, customer.phone, customer.lc].filter(Boolean);
-    right.forEach((t, i) => doc.text(String(t), W / 2 + 6, y + 6 + i * 6));
+  // --- Title ---
+  let y = 46;
+  doc.setFontSize(20);
+  doc.setFont(undefined, "bold");
+  doc.setTextColor(0, 0, 0);
+  doc.text("RODEO KICKOFF INVOICE", margin, y);
 
-    // --- table ---
-    y = 96;
-    const col = { item: M + 3, size: 98, qty: 120, unit: 156, amt: W - M - 3 };
-    doc.setFillColor(...BROWN); doc.rect(M, y, W - 2 * M, 10, "F");
-    doc.setTextColor(...CREAM); doc.setFont("helvetica", "bold"); doc.setFontSize(9);
-    doc.text("ITEM", col.item, y + 6.5); doc.text("SIZE", col.size, y + 6.5); doc.text("QTY", col.qty, y + 6.5);
-    doc.text("UNIT", col.unit, y + 6.5, { align: "right" }); doc.text("AMOUNT", col.amt, y + 6.5, { align: "right" });
-    y += 10;
+  // --- Two-Column Header: "Issued by:" & "Billed to:" ---
+  y += 14;
+  const rightColX = 112;
 
-    const rows = [];
-    if (conferenceFee != null) rows.push({ name: "Conference registration", size: "", qty: 1, price: conferenceFee });
-    lines.forEach((l) => rows.push(l));
+  doc.setFontSize(12);
+  doc.setFont(undefined, "bold");
+  doc.text("Issued by:", margin, y);
+  doc.text("Billed to:", rightColX, y);
 
-    doc.setTextColor(...BROWN); doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-    rows.forEach((r, i) => {
-        if (i % 2 === 0) { doc.setFillColor(247, 241, 230); doc.rect(M, y, W - 2 * M, 10, "F"); }
-        doc.text(r.name, col.item, y + 6.5);
-        doc.text(r.size || "-", col.size, y + 6.5);
-        doc.text(String(r.qty), col.qty, y + 6.5);
-        doc.text(money(r.price), col.unit, y + 6.5, { align: "right" });
-        doc.text(money(r.price * r.qty), col.amt, y + 6.5, { align: "right" });
-        y += 10;
+  y += 7;
+  doc.setFontSize(10.5);
+  doc.setFont(undefined, "normal");
+
+  // Left Column (Issued by)
+  doc.text("AIESEC in Constantine", margin, y);
+  doc.text("RODEO KICKOFF Constantine.", margin, y + 6);
+  doc.text("Constantine, Algeria.", margin, y + 12);
+
+  // Right Column (Billed to)
+  doc.text(`Name: ${customer.fullName || ""}`, rightColX, y);
+  doc.text(`Email: ${customer.email || ""}`, rightColX, y + 6);
+  doc.text(`Phone number: ${customer.phone || ""}`, rightColX, y + 12);
+  doc.text(`LC: ${customer.lc || "-"}`, rightColX, y + 18);
+
+  // --- Items Table (ITEM | SIZE | QTY | UNIT | AMOUNT) ---
+  y += 30;
+  const tableWidth = rightEdge - margin;
+  const rowHeight = 8.5;
+  const colX = {
+    item: margin + 3,
+    size: margin + 78,
+    qty: margin + 102,
+    unit: margin + 124,
+    amount: rightEdge - 3,
+  };
+
+  // Table Header Bar
+  doc.setFillColor(235, 235, 235);
+  doc.setDrawColor(180, 180, 180);
+  doc.setLineWidth(0.3);
+  doc.rect(margin, y, tableWidth, rowHeight, "FD");
+
+  doc.setFontSize(9.5);
+  doc.setFont(undefined, "bold");
+  doc.setTextColor(0, 0, 0);
+  doc.text("ITEM", colX.item, y + 5.8);
+  doc.text("SIZE", colX.size, y + 5.8);
+  doc.text("QTY", colX.qty, y + 5.8);
+  doc.text("UNIT", colX.unit, y + 5.8);
+  doc.text("AMOUNT", colX.amount, y + 5.8, { align: "right" });
+
+  y += rowHeight;
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(10);
+
+  (lines || []).forEach((line) => {
+    const subtotal = line.price * line.qty;
+    doc.rect(margin, y, tableWidth, rowHeight, "S");
+    doc.text(String(line.name), colX.item, y + 5.8);
+    doc.text(line.size || "-", colX.size, y + 5.8);
+    doc.text(String(line.qty), colX.qty, y + 5.8);
+    doc.text(`${line.price.toLocaleString("en-US")} DZD`, colX.unit, y + 5.8);
+    doc.text(`${subtotal.toLocaleString("en-US")} DZD`, colX.amount, y + 5.8, {
+      align: "right",
     });
+    y += rowHeight;
+  });
 
-    // --- total ---
-    y += 6;
-    doc.setDrawColor(...COPPER); doc.setLineWidth(0.6); doc.line(W - M - 80, y, W - M, y);
-    y += 9;
-    doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text("TOTAL", W - M - 80, y);
-    doc.setTextColor(...COPPER); doc.setFontSize(15); doc.text(money(total), W - M, y, { align: "right" });
+  if (conferenceFee != null) {
+    doc.rect(margin, y, tableWidth, rowHeight, "S");
+    doc.setFont(undefined, "bold");
+    doc.text("Conference Fee", colX.item, y + 5.8);
+    doc.text("-", colX.size, y + 5.8);
+    doc.text("1", colX.qty, y + 5.8);
+    doc.text(`${conferenceFee.toLocaleString("en-US")} DZD`, colX.unit, y + 5.8);
+    doc.text(`${conferenceFee.toLocaleString("en-US")} DZD`, colX.amount, y + 5.8, {
+      align: "right",
+    });
+    y += rowHeight;
+    doc.setFont(undefined, "normal");
+  }
 
-    // --- footer ---
-    doc.setTextColor(...BROWN); doc.setFont("helvetica", "normal"); doc.setFontSize(9);
-    doc.text("Thank you for being part of Rodeo Kick Off. Please keep this invoice and show it when collecting your goodies.", M, 276);
-    doc.setFillColor(...COPPER); doc.rect(0, 291, W, 6, "F");
+  // --- Total Row ---
+  doc.setFillColor(245, 245, 245);
+  doc.rect(margin, y, tableWidth, rowHeight + 1, "FD");
+  doc.setFontSize(11);
+  doc.setFont(undefined, "bold");
+  doc.text("TOTAL", colX.unit - 18, y + 6.2);
+  doc.text(`${total.toLocaleString("en-US")} DZD`, colX.amount, y + 6.2, {
+    align: "right",
+  });
 
-    const filename = `Facture-${number}.pdf`;
-    const blob = doc.output("blob");
-    const base64 = doc.output("datauristring").split(",")[1];
-    return { blob, base64, filename };
+  // --- Payment Notice ---
+  y += 22;
+  doc.setFontSize(10.5);
+  doc.setFont(undefined, "bold");
+  doc.setTextColor(0, 0, 0);
+  doc.text("You will be contacted very soon to proceed with the payment.", margin, y);
+
+  // --- Signatures ---
+  y += 16;
+  doc.setFontSize(10.5);
+  doc.setFont(undefined, "bold");
+  doc.text(
+    "Yousra KERBOUA | Local Committee President | AIESEC in Constantine 26.27",
+    margin,
+    y
+  );
+  y += 5.5;
+  doc.setFont(undefined, "normal");
+  doc.setTextColor(0, 0, 238);
+  doc.text("Email: yousra.kerboua@aiesec.net", margin, y);
+  y += 5.5;
+  doc.setTextColor(0, 0, 0);
+  doc.text("WhatsApp / Telegram: +213 657 44 07 22", margin, y);
+
+  y += 13;
+  doc.setFont(undefined, "bold");
+  doc.text(
+    "Nedjmeddine Tedjani | LCVP F&L | AIESEC in Constantine 26.27",
+    margin,
+    y
+  );
+  y += 5.5;
+  doc.setFont(undefined, "normal");
+  doc.setTextColor(0, 0, 238);
+  doc.text("Email: nedjmeddine.tedjani@aiesec.net", margin, y);
+  y += 5.5;
+  doc.setTextColor(0, 0, 0);
+  doc.text("WhatsApp / Telegram: +213 795 14 51 77", margin, y);
+
+  const filename = `rodeo-kickoff-invoice-${(customer.fullName || "delegate").replace(
+    /\s+/g,
+    "_"
+  )}.pdf`;
+  const blob = doc.output("blob");
+  const base64 = doc.output("datauristring").split(",")[1];
+  return { blob, base64, filename };
 }

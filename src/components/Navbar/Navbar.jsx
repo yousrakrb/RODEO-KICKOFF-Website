@@ -1,15 +1,16 @@
 // src/components/Navbar/Navbar.jsx
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import BookletModal from '../BookletModal/BookletModal';
 import './Navbar.css';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
+    const [bookletOpen, setBookletOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Track scroll for background glassmorphism while remaining fixed
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
@@ -20,7 +21,6 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Close menu on resize above 900px or when Escape is pressed
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth >= 900) {
@@ -42,7 +42,6 @@ export default function Navbar() {
         };
     }, []);
 
-    // Prevent background scrolling when mobile overlay is active
     useEffect(() => {
         if (isOpen) {
             const originalOverflow = document.body.style.overflow;
@@ -61,12 +60,16 @@ export default function Navbar() {
         setIsOpen(false);
     }, []);
 
-    // Smooth scroll handler for anchor links
+    const openBookletSelector = useCallback((e) => {
+        e.preventDefault();
+        closeMenu();
+        setBookletOpen(true);
+    }, [closeMenu]);
+
     const handleAnchorClick = useCallback((e, targetId) => {
         closeMenu();
 
         if (location.pathname !== '/') {
-            // When on another route (e.g. /apply or /preorder), navigate to home with hash
             e.preventDefault();
             navigate('/' + targetId);
             return;
@@ -106,7 +109,7 @@ export default function Navbar() {
                         />
                     </a>
 
-                    {/* Center: Desktop Navigation Links (hidden on < 900px) */}
+                    {/* Center: Desktop Navigation Links */}
                     <nav className="navbar-desktop-nav" aria-label="Main Navigation">
                         <ul className="navbar-desktop-links">
                             <li>
@@ -119,17 +122,18 @@ export default function Navbar() {
                                 </a>
                             </li>
                             <li>
-                                <a
-                                    href="/#explore-canyon"
-                                    onClick={(e) => handleAnchorClick(e, '#explore-canyon')}
+                                <button
+                                    type="button"
+                                    onClick={openBookletSelector}
                                     className="desktop-nav-link"
+                                    style={{ background: 'none', border: 'none', cursor: 'pointer' }}
                                 >
                                     Explore RODEO
-                                </a>
+                                </button>
                             </li>
                             <li>
                                 <Link
-                                    to="/gear"
+                                    to="/preorder"
                                     onClick={closeMenu}
                                     className="desktop-nav-link"
                                 >
@@ -154,7 +158,6 @@ export default function Navbar() {
                             />
                         </Link>
 
-                        {/* Hamburger Button (hidden on >= 900px) */}
                         <button
                             type="button"
                             className={`navbar-hamburger ${isOpen ? 'active' : ''}`}
@@ -173,7 +176,7 @@ export default function Navbar() {
                 </div>
             </header>
 
-            {/* Mobile Full-Screen Overlay Menu (Mobile & Tablet) */}
+            {/* Mobile Full-Screen Overlay Menu */}
             <div
                 id="mobile-overlay-menu"
                 className={`navbar-overlay ${isOpen ? 'open' : ''}`}
@@ -185,7 +188,6 @@ export default function Navbar() {
                 <div className="overlay-backdrop" onClick={closeMenu} />
                 <div className="overlay-scroll-container">
                     <div className="overlay-content">
-                        {/* Overlay Header */}
                         <div className="overlay-header">
                             <a
                                 href="/#hero"
@@ -221,7 +223,6 @@ export default function Navbar() {
                             </button>
                         </div>
 
-                        {/* Overlay Navigation Links */}
                         <div className="overlay-body">
                             <nav className="overlay-nav" aria-label="Mobile Navigation">
                                 <ul className="overlay-links">
@@ -236,29 +237,29 @@ export default function Navbar() {
                                         </a>
                                     </li>
                                     <li>
+                                        <button
+                                            type="button"
+                                            onClick={openBookletSelector}
+                                            className="overlay-link"
+                                            style={{ width: '100%', textAlign: 'left', cursor: 'pointer' }}
+                                        >
+                                            <span className="overlay-link-num">02</span>
+                                            <span className="overlay-link-text">EXPLORE RODEO</span>
+                                        </button>
+                                    </li>
+                                    <li>
                                         <Link
-                                            to="/gear"
+                                            to="/preorder"
                                             onClick={closeMenu}
                                             className="overlay-link"
                                         >
-                                            <span className="overlay-link-num">02</span>
+                                            <span className="overlay-link-num">03</span>
                                             <span className="overlay-link-text">THE GEAR</span>
                                         </Link>
-                                    </li>
-                                    <li>
-                                        <a
-                                            href="/#countdown"
-                                            onClick={(e) => handleAnchorClick(e, '#countdown')}
-                                            className="overlay-link"
-                                        >
-                                            <span className="overlay-link-num">03</span>
-                                            <span className="overlay-link-text">COUNTDOWN</span>
-                                        </a>
                                     </li>
                                 </ul>
                             </nav>
 
-                            {/* Overlay Apply Button Banner */}
                             <div className="overlay-apply-section">
                                 <Link
                                     to="/apply"
@@ -275,14 +276,16 @@ export default function Navbar() {
                             </div>
                         </div>
 
-                        {/* Overlay Footer Info */}
                         <div className="overlay-footer">
-                            <div className="overlay-badge">DZ-25 · 20–21 NOV · EAST</div>
+                            <div className="overlay-badge">DZ-25 · 27–28 NOV · EAST</div>
                             <p className="overlay-credit">AIESEC IN CONSTANTINE</p>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Local Sheriff / Stranger in Town Booklet Selector Modal */}
+            <BookletModal isOpen={bookletOpen} onClose={() => setBookletOpen(false)} />
         </>
     );
 }

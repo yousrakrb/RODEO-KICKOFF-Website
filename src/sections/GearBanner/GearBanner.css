@@ -1,0 +1,36 @@
+.gear-banner-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 0;
+  padding-bottom: clamp(6rem, 16vw, 10rem);
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  background-color: transparent;
+  box-sizing: border-box;
+}
+
+.gear-banner-link {
+  display: inline-block;
+  max-width: min(92vw, 680px);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s ease;
+}
+
+.gear-banner-link:hover {
+  transform: translateY(-6px) scale(1.03);
+  filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.45));
+}
+
+.gear-banner-link:active {
+  transform: translateY(-2px) scale(1.01);
+}
+
+.gear-banner-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}

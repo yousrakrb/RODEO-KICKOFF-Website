@@ -22,6 +22,15 @@ export default function Footer() {
                     className="footer-logo footer-logo-miras"
                 />
             </div>
+
+            <div className="footer-legal">
+                <p className="footer-privacy">
+                    All data collected is strictly confidential and protected under AIESEC data privacy regulations.
+                </p>
+                <p className="footer-copyright">
+                    © 2026 AIESEC in Constantine.
+                </p>
+            </div>
         </footer>
     );
 }

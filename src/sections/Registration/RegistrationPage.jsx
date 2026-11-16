@@ -17,6 +17,9 @@ import {
     getDelegatePrice,
 } from "./Config";
 import { generateInvoice, downloadBlob, blobToBase64 } from "../../utils/generateInvoice";
+import { PRODUCTS, MAX_QTY } from "../Preorder/products";
+import { useCart } from "../Preorder/useCart";
+import ProductGallery from "../Preorder/ProductGallery";
 import "./RegistrationPage.css";
 
 const STORAGE_KEY = "rodeo-registration-v1";
@@ -44,9 +47,12 @@ const EMPTY = {
     paymentMethod: "",
     day: "",
     attendanceConfirmed: "",
+    allergiesDietary: "",
+    specificSupport: "",
     policyAgreed: "",
     hype: 0,
     notes: "",
+    wantsPreorder: "", // "Yes" | "No"
 };
 
 /* ---------- small building blocks ---------- */
@@ -60,6 +66,8 @@ const EMOJI_CODES = {
     "⚠️": "26a0-fe0f",
     "📜": "1f4dc",
     "👨‍👩‍👧": "1f468-200d-1f469-200d-1f467",
+    "🛍️": "1f6cd-fe0f",
+    "📋": "1f4cb",
 };
 function Emoji({ char }) {
     const code = EMOJI_CODES[char];
@@ -122,8 +130,6 @@ function BigChoice({ title, text, active, onClick, emoji }) {
     );
 }
 
-// showThumbnail renders a small 32px preview inline in the button — used for
-// the photo upload so it doesn't blow up into a giant standalone image.
 function FileDrop({ accept, file, onChange, label, showThumbnail = false }) {
     const [previewUrl, setPreviewUrl] = useState(null);
 
@@ -161,6 +167,13 @@ function fileToDataUrl(file) {
     });
 }
 
+function makeOrderNumber() {
+    const now = new Date();
+    const stamp = now.toISOString().replace(/[-:T.]/g, "").slice(0, 14);
+    const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+    return `RK-${stamp}-${rand}`;
+}
+
 /* ---------- main component ---------- */
 
 export default function RegistrationPage() {
@@ -179,18 +192,18 @@ export default function RegistrationPage() {
             return 0;
         }
     });
+    const [cart, setCartItem] = useCart();
     const [errors, setErrors] = useState({});
     const [status, setStatus] = useState("idle"); // idle | sending | done | failed
     const [invoiceBlob, setInvoiceBlob] = useState(null);
     const [generating, setGenerating] = useState(false);
 
-    // File objects can't be JSON.stringify'd into sessionStorage — strip them before saving
     useEffect(() => {
         try {
             const { photoFile, conductPolicyFile, ...rest } = form;
             sessionStorage.setItem(STORAGE_KEY, JSON.stringify(rest));
         } catch {
-            /* storage unavailable: the form still works */
+            /* storage unavailable */
         }
     }, [form]);
 
@@ -207,27 +220,50 @@ export default function RegistrationPage() {
         setErrors((e) => ({ ...e, [key]: undefined }));
     };
 
-    // Steps adapt to the answers: LC step only for non-Constantine delegates,
-    // "parental" step only appears once age is known and under 21
     const steps = useMemo(() => {
         const s = ["origin"];
         if (form.fromConstantine === false) s.push("lc");
         s.push("pass", "personal", "aiesec", "conduct");
         const age = Number(form.age);
         if (form.age && Number.isFinite(age) && age < 21) s.push("parental");
-        s.push("rodeo", "fine");
+        s.push("rodeo", "fine", "preorder", "review");
         return s;
     }, [form.fromConstantine, form.age]);
 
     const stepId = status === "done" ? "done" : steps[stepIndex] || "origin";
     const reachedPass = stepIndex >= steps.indexOf("pass");
     const pass = PASSES.find((p) => p.id === form.pass);
-    const price = useMemo(() => getDelegatePrice(form), [form]);
+    const passPrice = useMemo(() => getDelegatePrice(form), [form]);
+
+    const preorderLines = useMemo(() => {
+        if (form.wantsPreorder !== "Yes") return [];
+        return PRODUCTS.filter((p) => cart[p.id]?.qty > 0).map((p) => ({
+            id: p.id,
+            name: p.name,
+            qty: cart[p.id].qty,
+            size: cart[p.id].size || "",
+            price: p.price,
+            subtotal: p.price * cart[p.id].qty,
+            requiresSize: p.sizes.length > 0,
+        }));
+    }, [cart, form.wantsPreorder]);
+
+    const goodiesTotal = preorderLines.reduce((sum, item) => sum + item.subtotal, 0);
+    const totalPrice = passPrice + goodiesTotal;
 
     const passIncludes = (p) =>
         p.includes.filter(
             (i) => i.key !== "transport" || form.fromConstantine !== true
         );
+
+    const goToStep = (targetStepId) => {
+        const idx = steps.indexOf(targetStepId);
+        if (idx !== -1) {
+            setErrors({});
+            setStepIndex(idx);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    };
 
     /* ---------- validation ---------- */
 
@@ -309,13 +345,25 @@ export default function RegistrationPage() {
             if (!form.hype) e.hype = "Rate your hype!";
         }
 
+        if (id === "preorder") {
+            if (!form.wantsPreorder) {
+                e.wantsPreorder = "Please choose Yes or No.";
+            } else if (form.wantsPreorder === "Yes") {
+                if (preorderLines.length === 0) {
+                    e.preorderCart = "Add at least one item to your cart, or select 'No' above.";
+                } else if (preorderLines.some((item) => item.requiresSize && !item.size)) {
+                    e.preorderCart = "Please select a size for every shirt in your cart.";
+                }
+            }
+        }
+
         setErrors(e);
         return Object.keys(e).length === 0;
     };
 
     const next = () => {
         if (!validate(stepId)) return;
-        if (stepId === "fine") return submit();
+        if (stepId === "review") return submit();
         setStepIndex((i) => i + 1);
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
@@ -351,15 +399,24 @@ export default function RegistrationPage() {
                 ? form.needsTransport === "Yes" ? "Yes" : "No"
                 : pass?.includes.some((i) => i.key === "transport") ? "Yes" : "No";
 
+        const customerLc = form.fromConstantine ? "Constantine" : form.lc;
+        const orderItems = preorderLines.map(({ id, name, qty, size, price }) => ({
+            id,
+            name,
+            qty,
+            size,
+            price,
+        }));
+
         const payload = {
-            formType: "registration", // tells the Apps Script which handler to use
+            formType: "registration",
             submitted_at: new Date().toISOString(),
             from_constantine: form.fromConstantine ? "Yes" : "No",
-            lc: form.fromConstantine ? "Constantine" : form.lc,
+            lc: customerLc,
             needs_transport: form.fromConstantine ? "N/A" : form.needsTransport,
             pickup_point: transportation === "Yes" ? form.pickupPoint : "",
             pass: pass?.name || "",
-            price,
+            price: passPrice,
             full_name: form.fullName.trim(),
             age: form.age,
             aiesec_mail: form.aiesecMail.trim().toLowerCase(),
@@ -374,6 +431,8 @@ export default function RegistrationPage() {
             payment_method: form.paymentMethod,
             day: form.pass === "small" ? form.day : "",
             attendance_confirmed: form.attendanceConfirmed,
+            allergies_dietary: form.allergiesDietary.trim() || "None",
+            specific_support: form.specificSupport.trim() || "None",
             policy_agreed: form.policyAgreed,
             parental_auth_acknowledged: form.parentalAuthAcknowledged || "N/A",
             transportation,
@@ -382,36 +441,35 @@ export default function RegistrationPage() {
             conduct_policy_filename: form.conductPolicyFile?.name || "",
             photo_filename: form.photoFile?.name || "",
             photo_mime_type: form.photoFile?.type || "image/jpeg",
+            // Combined pre-order payload (if any)
+            has_preorder: orderItems.length > 0,
+            preorder_invoice_number: orderItems.length > 0 ? makeOrderNumber() : "",
+            preorder_items: orderItems,
+            goodies_total: goodiesTotal,
+            final_total: totalPrice,
         };
 
         try {
-            // --- Step 1: build everything the payload needs (invoice PDF,
-            // photo, conduct policy) — nothing is downloaded or shown to the
-            // user yet, this is all just preparing data to send ---
             const blob = await generateInvoice({
-                name: form.fullName,
-                lc: form.fromConstantine ? "Constantine" : form.lc,
-                email: form.aiesecMail,
-                phone: form.phone,
+                name: form.fullName.trim(),
+                lc: customerLc,
+                email: form.aiesecMail.trim().toLowerCase(),
+                phone: form.phone.trim(),
                 passName: pass?.name || "",
-                price,
+                price: passPrice,
                 transportation,
+                items: orderItems,
+                total: totalPrice,
             });
             setInvoiceBlob(blob);
 
-            const invoiceFilename = `rodeo-kickoff-invoice-${form.fullName.replace(/\s+/g, "_")}.pdf`;
+            const invoiceFilename = `rodeo-kickoff-invoice-${form.fullName.trim().replace(/\s+/g, "_")}.pdf`;
             payload.invoice_pdf_base64 = await blobToBase64(blob);
             payload.invoice_filename = invoiceFilename;
 
             payload.photo_base64 = await fileToDataUrl(form.photoFile);
             payload.conduct_policy_base64 = await fileToDataUrl(form.conductPolicyFile);
 
-            // --- Step 2: submit to the sheet FIRST, before anything that
-            // could interrupt page execution. iOS Safari in particular can
-            // suspend a page's JavaScript when a file download/preview is
-            // triggered — so the critical network request must complete
-            // BEFORE we ever call downloadBlob() below. mode: 'no-cors' was
-            // removed so we can actually read whether this succeeded. ---
             const response = await fetch(SHEET_URL, {
                 method: "POST",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -423,14 +481,13 @@ export default function RegistrationPage() {
                 throw new Error(result.error || "Submission failed");
             }
 
-            // --- Step 3: ONLY now, after the sheet row is confirmed written,
-            // trigger the invoice download — safe even if iOS interrupts
-            // execution right after this point, since the critical part
-            // already succeeded ---
             downloadBlob(blob, invoiceFilename);
 
             sessionStorage.removeItem(STORAGE_KEY);
             sessionStorage.removeItem(STEP_KEY);
+            if (orderItems.length > 0) {
+                window.localStorage.removeItem("rodeo-preorder-cart");
+            }
             setStatus("done");
             window.scrollTo({ top: 0, behavior: "smooth" });
         } catch (err) {
@@ -470,9 +527,11 @@ export default function RegistrationPage() {
         parental: ["A word for your folks", "Underage outlaws need a permission slip."],
         rodeo: ["The Rodeo questions", "A few things before we hand you the ticket."],
         fine: ["The fine print", "Read it twice, partner."],
+        preorder: ["Gear up with Rodeo goodies", "Optional merch pre-order — bundled right into your invoice."],
+        review: ["Review your application", "Double-check all your answers before sending them to the Sheriff."],
     };
 
-    /* ---------- render ---------- */
+    /* ---------- render: DONE ---------- */
 
     if (stepId === "done") {
         return (
@@ -487,7 +546,16 @@ export default function RegistrationPage() {
                             <Emoji char={pass?.emoji} /> {pass?.name}
                         </p>
                         {form.pass === "small" && <p className="ticket-line">Day: {form.day}</p>}
-                        <p className="ticket-line">Price: {price.toLocaleString('en-US')} DZD</p>
+                        <p className="ticket-line">Pass: {passPrice.toLocaleString("en-US")} DZD</p>
+                        {preorderLines.length > 0 && (
+                            <p className="ticket-line">
+                                Goodies ({preorderLines.reduce((s, l) => s + l.qty, 0)} items):{" "}
+                                {goodiesTotal.toLocaleString("en-US")} DZD
+                            </p>
+                        )}
+                        <p className="ticket-line">
+                            <strong>Total: {totalPrice.toLocaleString("en-US")} DZD</strong>
+                        </p>
                     </div>
 
                     <ul className="next-steps">
@@ -517,7 +585,7 @@ export default function RegistrationPage() {
                                     onClick={() =>
                                         downloadBlob(
                                             invoiceBlob,
-                                            `rodeo-kickoff-invoice-${form.fullName.replace(/\s+/g, "_")}.pdf`
+                                            `rodeo-kickoff-invoice-${form.fullName.trim().replace(/\s+/g, "_")}.pdf`
                                         )
                                     }
                                 >
@@ -525,14 +593,15 @@ export default function RegistrationPage() {
                                 </button>
                             </div>
                         )}
-
                     </div>
 
-                    <p className="field-hint">Pack your boots and hat. See you on 20–21 Nov.</p>
+                    <p className="field-hint">Pack your boots and hat. See you on 27–28 Nov.</p>
                 </div>
             </main>
         );
     }
+
+    /* ---------- render: STEPS ---------- */
 
     return (
         <main className="rodeo-page">
@@ -752,7 +821,7 @@ export default function RegistrationPage() {
                         </Field>
                     )}
 
-                    {/* STEP: parental authorization (only shown when age < 21) */}
+                    {/* STEP: parental authorization */}
                     {stepId === "parental" && (
                         <Field
                             label="Parental Authorization"
@@ -778,7 +847,7 @@ export default function RegistrationPage() {
                         </Field>
                     )}
 
-                    {/* STEP: rodeo questions */}
+                    {/* STEP: rodeo questions (includes allergies & specific support) */}
                     {stepId === "rodeo" && (
                         <>
                             <Field
@@ -796,6 +865,30 @@ export default function RegistrationPage() {
 
                             <Field label="Why do you want to take part in the RODEO KICK-OFF?" error={errors.motivation}>
                                 <textarea rows={4} value={form.motivation} onChange={(e) => set("motivation", e.target.value)} />
+                            </Field>
+
+                            <Field
+                                label="Do you have any allergies, sicknesses, or dietary regulations the CC needs to know about?"
+                                hint="Leave blank or write 'None' if not applicable."
+                            >
+                                <textarea
+                                    rows={2}
+                                    placeholder="e.g., peanut allergy, asthma, vegetarian, none..."
+                                    value={form.allergiesDietary}
+                                    onChange={(e) => set("allergiesDietary", e.target.value)}
+                                />
+                            </Field>
+
+                            <Field
+                                label="Do you need any specific support from the CC?"
+                                hint="Accessibility, medical, accommodation, or any special assistance."
+                            >
+                                <textarea
+                                    rows={2}
+                                    placeholder="Let us know how we can best support you..."
+                                    value={form.specificSupport}
+                                    onChange={(e) => set("specificSupport", e.target.value)}
+                                />
                             </Field>
 
                             <Field
@@ -860,13 +953,262 @@ export default function RegistrationPage() {
                             <Field label="Anything to add?">
                                 <textarea rows={3} value={form.notes} onChange={(e) => set("notes", e.target.value)} />
                             </Field>
+                        </>
+                    )}
+
+                    {/* STEP: optional goodies pre-order */}
+                    {stepId === "preorder" && (
+                        <>
+                            <Field
+                                label="Do you want to pre-order your Rodeo goodies?"
+                                hint="If you choose Yes, your goodies will be added to your registration invoice."
+                                error={errors.wantsPreorder}
+                            >
+                                <Chips
+                                    options={["Yes", "No"]}
+                                    value={form.wantsPreorder}
+                                    onChange={(v) => {
+                                        set("wantsPreorder", v);
+                                        setErrors((err) => ({ ...err, preorderCart: undefined }));
+                                    }}
+                                />
+                            </Field>
+
+                            {form.wantsPreorder === "Yes" && (
+                                <div className="reg-preorder-box">
+                                    {errors.preorderCart && (
+                                        <p className="field-error" style={{ marginBottom: "14px" }}>
+                                            {errors.preorderCart}
+                                        </p>
+                                    )}
+
+                                    <div className="reg-po-grid">
+                                        {PRODUCTS.map((p) => {
+                                            const item = cart[p.id];
+                                            const qty = item?.qty || 0;
+                                            return (
+                                                <div key={p.id} className={`reg-po-card ${qty > 0 ? "is-added" : ""}`}>
+                                                    <div className="reg-po-media">
+                                                        <ProductGallery images={p.images} alt={p.name} />
+                                                    </div>
+                                                    <div className="reg-po-info">
+                                                        <h4>{p.name}</h4>
+                                                        <p className="reg-po-note">{p.note}</p>
+                                                        <p className="reg-po-price">{p.price.toLocaleString("en-US")} DZD</p>
+
+                                                        {p.sizes.length > 0 && (
+                                                            <div className="reg-po-sizes" role="radiogroup" aria-label={`${p.name} size`}>
+                                                                {p.sizes.map((s) => (
+                                                                    <button
+                                                                        key={s}
+                                                                        type="button"
+                                                                        className={item?.size === s ? "on" : ""}
+                                                                        onClick={() => {
+                                                                            setCartItem(p.id, { size: s, qty: qty || 1 });
+                                                                            setErrors((err) => ({ ...err, preorderCart: undefined }));
+                                                                        }}
+                                                                    >
+                                                                        {s}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        )}
+
+                                                        <div className="reg-po-action">
+                                                            {qty === 0 ? (
+                                                                <button
+                                                                    type="button"
+                                                                    className="wood-btn reg-po-add"
+                                                                    onClick={() => {
+                                                                        setCartItem(p.id, { qty: 1 });
+                                                                        setErrors((err) => ({ ...err, preorderCart: undefined }));
+                                                                    }}
+                                                                >
+                                                                    Add to order
+                                                                </button>
+                                                            ) : (
+                                                                <div className="reg-po-qty">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setCartItem(p.id, { qty: qty - 1 })}
+                                                                    >
+                                                                        &minus;
+                                                                    </button>
+                                                                    <span>{qty}</span>
+                                                                    <button
+                                                                        type="button"
+                                                                        disabled={qty >= MAX_QTY}
+                                                                        onClick={() => setCartItem(p.id, { qty: qty + 1 })}
+                                                                    >
+                                                                        +
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    )}
+
+                    {/* STEP: review before final submission */}
+                    {stepId === "review" && (
+                        <div className="review-wrap">
+                            <div className="review-section">
+                                <div className="review-head">
+                                    <h3>Origin & Pass</h3>
+                                    <button type="button" className="review-edit" onClick={() => goToStep("origin")}>
+                                        Edit
+                                    </button>
+                                </div>
+                                <dl className="review-list">
+                                    <div>
+                                        <dt>LC</dt>
+                                        <dd>{form.fromConstantine ? "Constantine" : form.lc}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Pass</dt>
+                                        <dd>{pass?.name} ({passPrice.toLocaleString("en-US")} DZD)</dd>
+                                    </div>
+                                    {form.pass === "small" && (
+                                        <div>
+                                            <dt>Attendance Day</dt>
+                                            <dd>{form.day}</dd>
+                                        </div>
+                                    )}
+                                    <div>
+                                        <dt>Transportation</dt>
+                                        <dd>
+                                            {form.fromConstantine === false
+                                                ? form.needsTransport === "Yes"
+                                                    ? `Yes (${form.pickupPoint})`
+                                                    : "No"
+                                                : pass?.includes.some((i) => i.key === "transport")
+                                                ? `Included (${form.pickupPoint})`
+                                                : "No"}
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+
+                            <div className="review-section">
+                                <div className="review-head">
+                                    <h3>Personal & AIESEC Badge</h3>
+                                    <button type="button" className="review-edit" onClick={() => goToStep("personal")}>
+                                        Edit
+                                    </button>
+                                </div>
+                                <dl className="review-list">
+                                    <div>
+                                        <dt>Full name</dt>
+                                        <dd>{form.fullName}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Age</dt>
+                                        <dd>{form.age}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>AIESEC Mail</dt>
+                                        <dd>{form.aiesecMail}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Phone</dt>
+                                        <dd>{form.phone}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Position & Dept</dt>
+                                        <dd>{form.position} · {form.department}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Photo & Policy PDF</dt>
+                                        <dd>
+                                            {form.photoFile?.name || "Uploaded"} · {form.conductPolicyFile?.name || "Uploaded"}
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+
+                            <div className="review-section">
+                                <div className="review-head">
+                                    <h3>Rodeo, Health & Support</h3>
+                                    <button type="button" className="review-edit" onClick={() => goToStep("rodeo")}>
+                                        Edit
+                                    </button>
+                                </div>
+                                <dl className="review-list">
+                                    <div>
+                                        <dt>Previous Kick-Off</dt>
+                                        <dd>
+                                            {form.previousDelegate === "Yes"
+                                                ? `Yes (${form.previousConference})`
+                                                : "No"}
+                                        </dd>
+                                    </div>
+                                    <div>
+                                        <dt>Payment Method</dt>
+                                        <dd>{form.paymentMethod}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Allergies / Dietary</dt>
+                                        <dd>{form.allergiesDietary.trim() || "None"}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Specific CC Support</dt>
+                                        <dd>{form.specificSupport.trim() || "None"}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Hype Level</dt>
+                                        <dd>{form.hype} / 5</dd>
+                                    </div>
+                                </dl>
+                            </div>
+
+                            <div className="review-section">
+                                <div className="review-head">
+                                    <h3>Goodies Pre-Order</h3>
+                                    <button type="button" className="review-edit" onClick={() => goToStep("preorder")}>
+                                        Edit
+                                    </button>
+                                </div>
+                                {preorderLines.length > 0 ? (
+                                    <dl className="review-list">
+                                        {preorderLines.map((l) => (
+                                            <div key={l.id}>
+                                                <dt>
+                                                    {l.qty} &times; {l.name}{l.size ? ` (${l.size})` : ""}
+                                                </dt>
+                                                <dd>{l.subtotal.toLocaleString("en-US")} DZD</dd>
+                                            </div>
+                                        ))}
+                                        <div className="review-total-row">
+                                            <dt>Final Total to Pay</dt>
+                                            <dd>{totalPrice.toLocaleString("en-US")} DZD</dd>
+                                        </div>
+                                    </dl>
+                                ) : (
+                                    <dl className="review-list">
+                                        <div>
+                                            <dt>Goodies</dt>
+                                            <dd>No goodies pre-ordered</dd>
+                                        </div>
+                                        <div className="review-total-row">
+                                            <dt>Final Total to Pay</dt>
+                                            <dd>{totalPrice.toLocaleString("en-US")} DZD</dd>
+                                        </div>
+                                    </dl>
+                                )}
+                            </div>
 
                             {status === "failed" && (
                                 <p className="field-error">
                                     The telegraph line is down. Check your connection and try again.
                                 </p>
                             )}
-                        </>
+                        </div>
                     )}
 
                     {/* nav */}
@@ -879,10 +1221,10 @@ export default function RegistrationPage() {
                             <span />
                         )}
                         <button type="button" className="wood-btn" onClick={next} disabled={status === "sending"}>
-                            {stepId === "fine"
+                            {stepId === "review"
                                 ? status === "sending"
                                     ? "Sending…"
-                                    : "Sign me up, Sheriff"
+                                    : "Confirm & Submit Application"
                                 : "Continue"}
                         </button>
                     </div>
@@ -905,7 +1247,23 @@ export default function RegistrationPage() {
                                     })}
                                 </ul>
                                 {form.fromConstantine === false && form.lc && <p className="sum-line">From LC {form.lc}</p>}
-                                <p className="sum-price">{price.toLocaleString('en-US')} DZD</p>
+                                <p className="sum-line">Pass: {passPrice.toLocaleString("en-US")} DZD</p>
+
+                                {preorderLines.length > 0 && (
+                                    <>
+                                        <hr style={{ opacity: 0.25, margin: "10px 0" }} />
+                                        <p className="sum-line"><strong>Pre-ordered goodies:</strong></p>
+                                        <ul>
+                                            {preorderLines.map((l) => (
+                                                <li key={l.id}>
+                                                    {l.qty}&times; {l.name}{l.size ? ` (${l.size})` : ""} — {l.subtotal.toLocaleString("en-US")} DZD
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </>
+                                )}
+
+                                <p className="sum-price">{totalPrice.toLocaleString("en-US")} DZD</p>
                             </>
                         ) : (
                             <p className="sum-line">No pass chosen yet.</p>
