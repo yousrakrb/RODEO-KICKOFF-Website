@@ -1,11 +1,6 @@
-/* src/components/Navbar/Navbar.css */
 @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap");
 
-/* ==========================================================================
-   MOBILE-FIRST BASE STYLES (< 900px)
-   ========================================================================== */
 
-/* Wrapper only — invisible, just handles fixed positioning */
 .site-navbar {
     position: fixed;
     top: 0;
@@ -180,7 +175,7 @@
 }
 
 /* ==========================================================================
-   MOBILE FULL-SCREEN OVERLAY MENU (unchanged in structure, same as before)
+   MOBILE FULL-SCREEN OVERLAY MENU
    ========================================================================== */
 
 .navbar-overlay {
@@ -330,7 +325,7 @@
 
 .overlay-link-text {
     font-family: 'Cinzel', serif;
-    font-size: clamp(1.3rem, 5vw, 1.7rem);
+    font-size: clamp(1.2rem, 4.6vw, 1.65rem);
     font-weight: 600;
     color: #f3e3c3;
     letter-spacing: 0.03em;
@@ -419,7 +414,6 @@
         justify-content: center;
     }
 
-    /* no background of its own anymore — just sits inside the shared capsule */
     .navbar-desktop-links {
         display: flex;
         align-items: center;
@@ -431,7 +425,6 @@
         border: none;
     }
 
-    /* plain text link, color shift only — no per-link pill */
     .desktop-nav-link {
         position: relative;
         display: inline-block;

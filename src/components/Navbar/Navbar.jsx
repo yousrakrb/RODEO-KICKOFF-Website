@@ -52,6 +52,27 @@ export default function Navbar() {
         }
     }, [isOpen]);
 
+    // Smooth-scroll to hash target when navigating back to "/" from another route
+    useEffect(() => {
+        if (location.pathname === '/' && location.hash) {
+            const timer = setTimeout(() => {
+                const targetElement = document.querySelector(location.hash);
+                if (targetElement) {
+                    if (window.lenis) {
+                        window.lenis.scrollTo(targetElement, {
+                            offset: -80,
+                            duration: 1.2,
+                            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                        });
+                    } else {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+            }, 120);
+            return () => clearTimeout(timer);
+        }
+    }, [location.pathname, location.hash]);
+
     const toggleMenu = useCallback(() => {
         setIsOpen((prev) => !prev);
     }, []);
@@ -114,11 +135,11 @@ export default function Navbar() {
                         <ul className="navbar-desktop-links">
                             <li>
                                 <a
-                                    href="/#canyon-map"
-                                    onClick={(e) => handleAnchorClick(e, '#canyon-map')}
+                                    href="/#why-our-kickoff"
+                                    onClick={(e) => handleAnchorClick(e, '#why-our-kickoff')}
                                     className="desktop-nav-link"
                                 >
-                                    THE CANYON
+                                    WHY OUR KICKOFF
                                 </a>
                             </li>
                             <li>
@@ -128,7 +149,7 @@ export default function Navbar() {
                                     className="desktop-nav-link"
                                     style={{ background: 'none', border: 'none', cursor: 'pointer' }}
                                 >
-                                    Explore RODEO
+                                    EXPLORE RODEO
                                 </button>
                             </li>
                             <li>
@@ -176,7 +197,7 @@ export default function Navbar() {
                 </div>
             </header>
 
-            {/* Mobile Full-Screen Overlay Menu */}
+            {/* Mobile Full-Screen Overlay Menu (same tabs as desktop navbar) */}
             <div
                 id="mobile-overlay-menu"
                 className={`navbar-overlay ${isOpen ? 'open' : ''}`}
@@ -228,12 +249,12 @@ export default function Navbar() {
                                 <ul className="overlay-links">
                                     <li>
                                         <a
-                                            href="/#canyon-map"
-                                            onClick={(e) => handleAnchorClick(e, '#canyon-map')}
+                                            href="/#why-our-kickoff"
+                                            onClick={(e) => handleAnchorClick(e, '#why-our-kickoff')}
                                             className="overlay-link"
                                         >
                                             <span className="overlay-link-num">01</span>
-                                            <span className="overlay-link-text">THE CANYON</span>
+                                            <span className="overlay-link-text">WHY OUR KICKOFF</span>
                                         </a>
                                     </li>
                                     <li>

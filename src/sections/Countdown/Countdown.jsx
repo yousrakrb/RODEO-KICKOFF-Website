@@ -80,7 +80,7 @@ export default function Countdown() {
                 <CountdownPair card1={pair2[0]} card2={pair2[1]} />
             </div>
 
-            <div className="bottom-asset-container">
+            <div className="bottom-asset-container" id="why-our-kickoff">
                 <img
                     src="/assets/countdown/WhyOurKickoff.png"
                     alt="Why Our KickOff"
