@@ -15,7 +15,7 @@ export const PRODUCTS = [
   },
   {
     id: "cap",
-    name: "AIESEC Constantine Cap",
+    name: "AIESEC in Constantine Cap",
     note: "Adjustable, one size fits all",
     price: 1500,
     sizes: [],
