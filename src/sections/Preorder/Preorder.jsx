@@ -231,76 +231,6 @@ export default function PreOrder({ applicant, conferenceFee = null, sheetUrl, lo
                 </div>
               </motion.form>
             )}
-
-            <section className="po-grid" aria-label="Goodies">
-              {PRODUCTS.map((p, i) => {
-                const item = cart[p.id];
-                const qty = item?.qty || 0;
-                const sizeErr = showErrors && qty > 0 && p.sizes.length && !item?.size;
-
-                return (
-                  <motion.article
-                    key={p.id}
-                    className={`po-card ${qty ? "is-added" : ""}`}
-                    initial={{ opacity: 0, y: 36 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.2 }}
-                    transition={{ duration: 0.7, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    <Link to={`/preorder/${p.id}`} className="po-media" aria-label={`View ${p.name}`}>
-                      <ProductGallery images={p.images} alt={p.name} />
-                    </Link>
-
-                    <div className="po-info">
-                      <h2>{p.name}</h2>
-                      <p className="po-note">{p.note}</p>
-                      <p className="po-price">{fmt(p.price)}</p>
-
-                      {p.sizes.length > 0 && (
-                        <div className="po-sizes" role="radiogroup" aria-label={`${p.name} size`}>
-                          {p.sizes.map((s) => (
-                            <button
-                              key={s}
-                              type="button"
-                              role="radio"
-                              aria-checked={item?.size === s}
-                              className={item?.size === s ? "on" : ""}
-                              onClick={() => setItem(p.id, { size: s, qty: qty || 1 })}
-                            >
-                              {s}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      {sizeErr && <p className="po-err">Pick a size</p>}
-
-                      <div className="po-action">
-                        {qty === 0 ? (
-                          <button type="button" className="po-add" onClick={() => setItem(p.id, { qty: 1 })}>
-                            Add to order
-                          </button>
-                        ) : (
-                          <div className="po-qty" aria-label={`${p.name} quantity`}>
-                            <button type="button" aria-label="Remove one" onClick={() => setItem(p.id, { qty: qty - 1 })}>
-                              &minus;
-                            </button>
-                            <span>{qty}</span>
-                            <button
-                              type="button"
-                              aria-label="Add one"
-                              disabled={qty >= MAX_QTY}
-                              onClick={() => setItem(p.id, { qty: qty + 1 })}
-                            >
-                              +
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </motion.article>
-                );
-              })}
-            </section>
           </div>
 
           {/* ---------- summary (toggleable on mobile, sticky on desktop) ---------- */}
@@ -384,6 +314,77 @@ export default function PreOrder({ applicant, conferenceFee = null, sheetUrl, lo
               )}
             </div>
           </aside>
+
+          {/* ---------- 3 product cards spanning full width ---------- */}
+          <section className="po-grid" aria-label="Goodies">
+            {PRODUCTS.map((p, i) => {
+              const item = cart[p.id];
+              const qty = item?.qty || 0;
+              const sizeErr = showErrors && qty > 0 && p.sizes.length && !item?.size;
+
+              return (
+                <motion.article
+                  key={p.id}
+                  className={`po-card ${qty ? "is-added" : ""}`}
+                  initial={{ opacity: 0, y: 36 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.7, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <Link to={`/preorder/${p.id}`} className="po-media" aria-label={`View ${p.name}`}>
+                    <ProductGallery images={p.images} alt={p.name} />
+                  </Link>
+
+                  <div className="po-info">
+                    <h2>{p.name}</h2>
+                    <p className="po-note">{p.note}</p>
+                    <p className="po-price">{fmt(p.price)}</p>
+
+                    {p.sizes.length > 0 && (
+                      <div className="po-sizes" role="radiogroup" aria-label={`${p.name} size`}>
+                        {p.sizes.map((s) => (
+                          <button
+                            key={s}
+                            type="button"
+                            role="radio"
+                            aria-checked={item?.size === s}
+                            className={item?.size === s ? "on" : ""}
+                            onClick={() => setItem(p.id, { size: s, qty: qty || 1 })}
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {sizeErr && <p className="po-err">Pick a size</p>}
+
+                    <div className="po-action">
+                      {qty === 0 ? (
+                        <button type="button" className="po-add" onClick={() => setItem(p.id, { qty: 1 })}>
+                          Add to order
+                        </button>
+                      ) : (
+                        <div className="po-qty" aria-label={`${p.name} quantity`}>
+                          <button type="button" aria-label="Remove one" onClick={() => setItem(p.id, { qty: qty - 1 })}>
+                            &minus;
+                          </button>
+                          <span>{qty}</span>
+                          <button
+                            type="button"
+                            aria-label="Add one"
+                            disabled={qty >= MAX_QTY}
+                            onClick={() => setItem(p.id, { qty: qty + 1 })}
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.article>
+              );
+            })}
+          </section>
         </div>
       </div>
     </main>

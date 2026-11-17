@@ -1,6 +1,3 @@
-/* ------------------------------------------------------------------
-   PALETTE: map these to the variables your site already uses.
------------------------------------------------------------------- */
 .po {
   --po-bg: var(--color-bg, #3b2a1e);
   --po-surface: color-mix(in srgb, var(--po-cream) 5%, var(--po-bg));
@@ -105,15 +102,18 @@
   align-items: start;
 }
 
-/* 3 cards in the same line on desktop */
+/* 3 cards in the same line, stretching across the full width */
 .po-grid {
+  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(14px, 1.6vw, 20px);
+  gap: clamp(18px, 2.2vw, 28px);
+  width: 100%;
 }
 
 /* ---------- product card ---------- */
 .po-card {
+  width: 100%;
   display: flex;
   flex-direction: column;
   background: var(--po-surface);
@@ -157,6 +157,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 16px;
   touch-action: pan-y;
   user-select: none;
 }
@@ -165,8 +166,10 @@
   display: block;
   position: relative;
   z-index: 1;
-  width: 80%;
-  height: 85%;
+  width: 100%;
+  height: 100%;
+  margin: auto;
+  border-radius: 12px;
   object-fit: contain;
   cursor: grab;
   will-change: transform, opacity, filter;
@@ -272,7 +275,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: clamp(14px, 1.6vw, 20px);
+  padding: clamp(16px, 1.8vw, 22px);
   flex: 1;
 }
 
@@ -282,12 +285,12 @@
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: .06em;
-  font-size: clamp(15px, 1.4vw, 18px);
+  font-size: clamp(16px, 1.5vw, 19px);
 }
 
 .po-note {
   margin: 0;
-  font-size: 13.5px;
+  font-size: 14px;
   opacity: .65;
   line-height: 1.45;
 }
@@ -295,7 +298,7 @@
 .po-price {
   margin: 6px 0 4px;
   color: var(--po-copper);
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 600;
   letter-spacing: .02em;
 }
@@ -308,16 +311,16 @@
 }
 
 .po-sizes button {
-  min-width: 38px;
-  height: 34px;
-  padding: 0 9px;
+  min-width: 40px;
+  height: 36px;
+  padding: 0 10px;
   border-radius: 9px;
   cursor: pointer;
   background: transparent;
   color: var(--po-cream);
   border: 1px solid var(--po-line);
   font: inherit;
-  font-size: 12px;
+  font-size: 12.5px;
   letter-spacing: .05em;
   transition: all .25s;
 }
@@ -518,12 +521,6 @@
 }
 
 /* ---------- responsive ---------- */
-@media (max-width: 1180px) {
-  .po-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 960px) {
   .po-layout {
     grid-template-columns: 1fr;
@@ -579,11 +576,13 @@
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 680px) {
   .po-grid {
     grid-template-columns: 1fr;
   }
+}
 
+@media (max-width: 560px) {
   .po-steps li:not(.now) {
     font-size: 0;
     gap: 0;
@@ -619,7 +618,7 @@
 }
 
 .po-form {
-  margin-bottom: clamp(16px, 2.4vw, 28px);
+  margin-bottom: 0;
   padding: clamp(18px, 2.4vw, 28px);
   background: var(--po-surface);
   border: 1px solid var(--po-line);
@@ -696,11 +695,6 @@
   font-style: normal;
   font-size: 12px;
   color: var(--po-copper);
-}
-
-.po-form + .po-grid,
-.po-who + .po-grid {
-  margin-top: 0;
 }
 
 .po-done {
@@ -812,8 +806,8 @@
 }
 
 .po-gallery-large img {
-  width: 82%;
-  height: 90%;
+  width: 100%;
+  height: 100%;
 }
 
 .po-detail-info {
