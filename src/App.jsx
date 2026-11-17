@@ -1,4 +1,5 @@
 // src/App.jsx
+import { useEffect } from 'react';
 import { Routes, Route, Outlet } from 'react-router-dom';
 import './App.css';
 import Hero from './sections/Hero/Hero';
@@ -30,6 +31,22 @@ function Layout() {
 }
 
 function LandingPage() {
+  useEffect(() => {
+    const clearHash = () => {
+      if (window.location.hash) {
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+    };
+
+    window.addEventListener("wheel", clearHash, { passive: true });
+    window.addEventListener("touchmove", clearHash, { passive: true });
+
+    return () => {
+      window.removeEventListener("wheel", clearHash);
+      window.removeEventListener("touchmove", clearHash);
+    };
+  }, []);
+
   return (
     <>
       <div className="fixed-background" />
@@ -52,7 +69,7 @@ function App() {
         <Route path="/apply" element={<RegistrationPage />} />
         <Route
           path="/preorder"
-          element={<PreOrder sheetUrl={"https://script.google.com/macros/s/AKfycbwRs-uIq35mOa9U04sI2DK4612Jkt7-WNf0L28YHALXVWNnvVb9ygjdhZIOwI4bcWSN/exec"} logoUrl="/assets/invoice/aiesec-logo.png" />}
+          element={<PreOrder sheetUrl={SHEET_URL} logoUrl="/assets/invoice/aiesec-logo.png" />}
         />
         <Route path="/preorder/:productId" element={<ProductDetail />} />
       </Route>
