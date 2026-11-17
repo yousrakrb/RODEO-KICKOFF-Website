@@ -157,6 +157,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  touch-action: pan-y;
+  user-select: none;
 }
 
 .po-gallery img {
@@ -166,73 +168,104 @@
   width: 80%;
   height: 85%;
   object-fit: contain;
-  transition: transform .7s cubic-bezier(.22, 1, .36, 1);
+  cursor: grab;
+  will-change: transform, opacity, filter;
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.28));
 }
 
-.po-card:hover .po-gallery img {
-  transform: scale(1.06) rotate(-1.5deg);
+.po-gallery img:active {
+  cursor: grabbing;
 }
 
 .po-gallery-arrow {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
+  transform: translateY(-50%) scale(0.92);
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  border: 1px solid var(--po-line);
-  background: color-mix(in srgb, var(--po-bg) 75%, transparent);
+  border: 1px solid color-mix(in srgb, var(--po-cream) 20%, transparent);
+  background: color-mix(in srgb, var(--po-bg) 65%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--po-cream);
-  font-size: 20px;
-  line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: .85;
-  z-index: 2;
-  transition: opacity .25s, background-color .25s, color .25s;
+  opacity: 0;
+  z-index: 3;
+  transition: opacity .25s ease, transform .25s cubic-bezier(.22, 1, .36, 1), background-color .2s ease, color .2s ease, border-color .2s ease;
+}
+
+.po-media:hover .po-gallery-arrow,
+.po-media:focus-within .po-gallery-arrow,
+.po-detail-media:hover .po-gallery-arrow,
+.po-detail-media:focus-within .po-gallery-arrow {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+@media (hover: none) {
+  .po-gallery-arrow {
+    opacity: 0.85;
+    transform: translateY(-50%) scale(1);
+  }
 }
 
 .po-gallery-arrow:hover {
-  opacity: 1;
   background: var(--po-copper);
   color: var(--po-bg);
   border-color: var(--po-copper);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.po-gallery-arrow:active {
+  transform: translateY(-50%) scale(0.95);
 }
 
 .po-gallery-arrow.left {
-  left: 8px;
+  left: 10px;
 }
 
 .po-gallery-arrow.right {
-  right: 8px;
+  right: 10px;
 }
 
 .po-gallery-dots {
   position: absolute;
-  bottom: 10px;
+  bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
+  align-items: center;
   gap: 6px;
-  z-index: 2;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--po-bg) 55%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 3;
 }
 
 .po-gallery-dots button {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: 999px;
   border: none;
   padding: 0;
-  background: color-mix(in srgb, var(--po-cream) 35%, transparent);
+  background: color-mix(in srgb, var(--po-cream) 40%, transparent);
   cursor: pointer;
-  transition: background-color .25s, transform .25s;
+  transition: width .35s cubic-bezier(.22, 1, .36, 1), background-color .25s ease;
+}
+
+.po-gallery-dots button:hover {
+  background: color-mix(in srgb, var(--po-cream) 75%, transparent);
 }
 
 .po-gallery-dots button.on {
+  width: 18px;
   background: var(--po-copper);
-  transform: scale(1.3);
 }
 
 .po-info {
@@ -621,7 +654,8 @@
   opacity: .7;
 }
 
-.po-fields input {
+.po-fields input,
+.po-fields select {
   height: 46px;
   padding: 0 14px;
   border-radius: 10px;
@@ -633,12 +667,28 @@
   transition: border-color .25s;
 }
 
-.po-fields input:focus {
+.po-fields select {
+  appearance: none;
+  padding-right: 38px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23e9d6b4' d='M1.4 0L6 4.6 10.6 0 12 1.4l-6 6-6-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+
+.po-fields select option {
+  background: var(--po-bg);
+  color: var(--po-cream);
+}
+
+.po-fields input:focus,
+.po-fields select:focus {
   outline: none;
   border-color: var(--po-copper);
 }
 
-.po-fields label.bad input {
+.po-fields label.bad input,
+.po-fields label.bad select {
   border-color: var(--po-copper);
 }
 

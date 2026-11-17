@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { generateInvoice, makeInvoiceNumber } from "../Invoice/Invoice";
+import { LCS } from "../Registration/Config";
 import { PRODUCTS, MAX_QTY } from "./products";
 import { useCart } from "./useCart";
 import ProductGallery from "./ProductGallery";
@@ -9,6 +10,7 @@ import "./Preorder.css";
 
 const fmt = (n) => `${n.toLocaleString("en-US")} DZD`;
 const emailOk = (s) => /^\S+@\S+\.\S+$/.test(s);
+const PREORDER_LCS = ["Constantine", ...LCS];
 
 export default function PreOrder({ applicant, conferenceFee = null, sheetUrl, logoUrl, onSkip, onComplete }) {
   const attached = !!applicant;
@@ -43,8 +45,9 @@ export default function PreOrder({ applicant, conferenceFee = null, sheetUrl, lo
     fullName: !form.fullName.trim(),
     email: !emailOk(form.email.trim()),
     phone: form.phone.replace(/\D/g, "").length < 8,
+    lc: !form.lc.trim(),
   };
-  const formInvalid = !attached && (errors.fullName || errors.email || errors.phone);
+  const formInvalid = !attached && (errors.fullName || errors.email || errors.phone || errors.lc);
 
   const confirm = async () => {
     if (!lines.length || status === "working") return;
@@ -92,7 +95,7 @@ export default function PreOrder({ applicant, conferenceFee = null, sheetUrl, lo
           mode: "no-cors",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({
-            formType: "preorder", // routes this to handlePreOrder on the Apps Script side
+            formType: "preorder",
             invoiceNumber: number,
             mode: attached ? "with application" : "independent",
             customer,
@@ -195,7 +198,6 @@ export default function PreOrder({ applicant, conferenceFee = null, sheetUrl, lo
                     ["fullName", "Full name", "text", "name"],
                     ["email", "Email", "email", "email"],
                     ["phone", "Phone number", "tel", "tel"],
-                    ["lc", "Local committee / city (optional)", "text", "organization"],
                   ].map(([k, label, type, ac]) => (
                     <label key={k} className={showErrors && errors[k] ? "bad" : ""}>
                       <span>{label}</span>
@@ -210,6 +212,22 @@ export default function PreOrder({ applicant, conferenceFee = null, sheetUrl, lo
                       )}
                     </label>
                   ))}
+
+                  <label className={showErrors && errors.lc ? "bad" : ""}>
+                    <span>Local committee</span>
+                    <select
+                      value={form.lc}
+                      onChange={(e) => setForm({ ...form, lc: e.target.value })}
+                    >
+                      <option value="">Select your LC</option>
+                      {PREORDER_LCS.map((lc) => (
+                        <option key={lc} value={lc}>
+                          {lc}
+                        </option>
+                      ))}
+                    </select>
+                    {showErrors && errors.lc && <em>Select your LC</em>}
+                  </label>
                 </div>
               </motion.form>
             )}
