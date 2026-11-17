@@ -31,8 +31,8 @@ export const PRODUCTS = [
     price: 1200,
     sizes: [],
     images: [
-      "/assets/pre-order/aic-tote1.jpg",
-      "/assets/pre-order/aic-tote2.jpg",
+      "/assets/pre-order/aic-tote1.png",
+      "/assets/pre-order/aic-tote2.png",
     ],
   },
 ];
