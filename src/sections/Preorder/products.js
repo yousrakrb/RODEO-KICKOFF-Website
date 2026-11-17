@@ -7,10 +7,10 @@ export const PRODUCTS = [
     price: 2500,
     sizes: ["S", "M", "L", "XL", "XXL"],
     images: [
-      "public/assets/pre-order/aic-shirt1.png",
-      "public/assets/pre-order/aic-shirt2.png",
-      "public/assets/pre-order/aic-shirt3.png",
-      "public/assets/pre-order/aic-shirt4.png",
+      "/assets/pre-order/aic-shirt1.png",
+      "/assets/pre-order/aic-shirt2.png",
+      "/assets/pre-order/aic-shirt3.png",
+      "/assets/pre-order/aic-shirt4.png",
     ],
   },
   {
@@ -20,8 +20,8 @@ export const PRODUCTS = [
     price: 1500,
     sizes: [],
     images: [
-      "public/assets/pre-order/aic-cap1.png",
-      "public/assets/pre-order/aic-cap2.png",
+      "/assets/pre-order/aic-cap1.png",
+      "/assets/pre-order/aic-cap2.png",
     ],
   },
   {
@@ -31,8 +31,8 @@ export const PRODUCTS = [
     price: 1200,
     sizes: [],
     images: [
-      "public/assets/pre-order/aic-tote1.jpg",
-      "public/assets/pre-order/aic-tote2.jpg",
+      "/assets/pre-order/aic-tote1.jpg",
+      "/assets/pre-order/aic-tote2.jpg",
     ],
   },
 ];
