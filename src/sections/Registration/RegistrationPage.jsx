@@ -1,4 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from "react";
+import { useRegistrationStatus } from "../../hooks/useRegistrationStatus";
+import { RegistrationClosed } from "./RegistrationClosed";
 import {
     SHEET_URL,
     LCS,
@@ -177,6 +179,8 @@ function makeOrderNumber() {
 /* ---------- main component ---------- */
 
 export default function RegistrationPage() {
+    const registrationStatus = useRegistrationStatus();
+
     const [form, setForm] = useState(() => {
         try {
             const saved = sessionStorage.getItem(STORAGE_KEY);
@@ -441,7 +445,6 @@ export default function RegistrationPage() {
             conduct_policy_filename: form.conductPolicyFile?.name || "",
             photo_filename: form.photoFile?.name || "",
             photo_mime_type: form.photoFile?.type || "image/jpeg",
-            // Combined pre-order payload (if any)
             has_preorder: orderItems.length > 0,
             preorder_invoice_number: orderItems.length > 0 ? makeOrderNumber() : "",
             preorder_items: orderItems,
@@ -511,6 +514,21 @@ export default function RegistrationPage() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [form.pass, form.fromConstantine]);
+
+    // Prevent the form from flashing while checking registration status
+    if (registrationStatus === "loading") {
+        return (
+            <main className="rodeo-page">
+                <div className="leather-card success">
+                    <p className="lead">Checking the gates, partner…</p>
+                </div>
+            </main>
+        );
+    }
+
+    if (registrationStatus === "closed") {
+        return <RegistrationClosed />;
+    }
 
     const attendanceText =
         form.pass === "small"
